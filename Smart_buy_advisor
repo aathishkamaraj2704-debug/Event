@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartBuy — Student Purchase Advisor</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:       #1a1209;
+  --ink2:      #2d2416;
+  --parchment: #f5efe6;
+  --cream:     #fdf8f1;
+  --warm:      #ede4d3;
+  --saffron:   #e8870a;
+  --saffron2:  #f5a623;
+  --sage:      #5a8a6a;
+  --sage2:     #7ab88a;
+  --rose:      #c0524a;
+  --rose2:     #e07060;
+  --sky:       #4a7ab5;
+  --gold:      #c9962a;
+  --text:      #2d2416;
+  --muted:     #8a7a62;
+  --border:    #d8ccba;
+  --border2:   #ede4d3;
+  --font-d: 'Playfair Display', Georgia, serif;
+  --font-b: 'Outfit', system-ui, sans-serif;
+  --r:  14px;  --rl: 22px;  --rxl: 32px;
+  --sh: 0 2px 8px rgba(26,18,9,0.08);
+  --sh2: 0 6px 28px rgba(26,18,9,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--cream);color:var(--text);font-family:var(--font-b);min-height:100vh;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9998;opacity:.5;}
+
+/* DECO LINES */
+.deco{width:100%;height:3px;background:repeating-linear-gradient(90deg,var(--saffron) 0,var(--saffron) 36px,transparent 36px,transparent 44px);}
+.deco-thin{width:100%;height:1px;background:var(--border);}
+
+/* LAYOUT */
+.app{max-width:860px;margin:0 auto;padding:0 20px 80px;position:relative;z-index:1;}
+
+/* MASTHEAD */
+.masthead{padding:36px 0 26px;text-align:center;border-bottom:1px solid var(--border);}
+.kicker{font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--saffron);margin-bottom:10px;display:block;}
+.masthead h1{font-family:var(--font-d);font-size:clamp(2.8rem,9vw,5.2rem);font-weight:900;line-height:1;letter-spacing:-1px;color:var(--ink);}
+.masthead h1 em{font-style:italic;color:var(--saffron);}
+.masthead p{font-size:14px;color:var(--muted);margin-top:10px;max-width:400px;margin-inline:auto;line-height:1.6;}
+.dateline{font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-top:12px;font-weight:600;}
+
+/* QUOTE BAR */
+.quote-bar{background:var(--ink);color:var(--parchment);padding:14px 24px;text-align:center;}
+.quote-bar q{font-family:var(--font-d);font-style:italic;font-size:14px;quotes:none;}
+.q-attr{font-family:var(--font-b);font-size:11px;color:var(--saffron2);font-weight:700;letter-spacing:1px;margin-top:4px;display:block;}
+
+/* NAV */
+.nav-strip{display:flex;border-bottom:2px solid var(--ink);background:var(--cream);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(26,18,9,0.05);}
+.ntab{flex:1;padding:14px 6px;background:none;border:none;border-right:1px solid var(--border);font-family:var(--font-b);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all .2s;position:relative;}
+.ntab:last-child{border-right:none;}
+.ntab.active{color:var(--ink);background:var(--parchment);}
+.ntab.active::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;background:var(--saffron);}
+.ntab:hover:not(.active){background:var(--warm);}
+
+/* TAB PANE */
+.tab-pane{display:none;padding:26px 0;}
+.tab-pane.active{display:block;}
+
+/* PROGRESS */
+.prog-wrap{margin-bottom:22px;}
+.prog-top{display:flex;justify-content:space-between;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.prog-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--saffron),var(--sage));border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+
+/* SCREENS */
+.screen{display:none;}
+.screen.active{display:block;animation:fu .35s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARD */
+.card{background:var(--parchment);border:1px solid var(--border);border-radius:var(--rl);padding:26px;margin-bottom:16px;box-shadow:var(--sh);}
+.card-kicker{display:block;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--saffron);margin-bottom:12px;}
+.card-h{font-family:var(--font-d);font-size:1.4rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
+
+/* SECTION RULE */
+.srule{display:flex;align-items:center;gap:10px;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin:20px 0 12px;}
+.srule::before,.srule::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* FIELDS */
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.field input,.field select{width:100%;background:var(--cream);border:1.5px solid var(--border);border-radius:var(--r);padding:12px 14px;color:var(--text);font-family:var(--font-b);font-size:15px;transition:border-color .2s,box-shadow .2s;outline:none;}
+.field input:focus,.field select:focus{border-color:var(--saffron);box-shadow:0 0 0 3px rgba(232,135,10,.1);background:#fff;}
+.fhint{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;}
+.stat-box{background:var(--cream);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;}
+.stat-v{font-family:var(--font-d);font-size:1.2rem;font-weight:700;color:var(--saffron);}
+.stat-l{font-size:10px;color:var(--muted);margin-top:3px;font-weight:600;line-height:1.3;}
+
+/* PRODUCT GRID */
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
+.pcard{background:var(--cream);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s;}
+.pcard:hover{border-color:var(--saffron);background:var(--parchment);transform:translateY(-2px);box-shadow:var(--sh);}
+.pcard.sel{border-color:var(--saffron);background:rgba(232,135,10,.07);box-shadow:0 0 0 3px rgba(232,135,10,.12);}
+.picon{font-size:1.7rem;display:block;margin-bottom:5px;}
+.pname{font-size:10px;font-weight:700;letter-spacing:.3px;}
+
+/* QUESTIONS */
+.qblock{background:var(--cream);border:1px solid var(--border2);border-radius:var(--r);padding:16px;margin-bottom:10px;transition:border-color .2s;}
+.qblock:hover{border-color:var(--border);}
+.qtop{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;}
+.qnum{min-width:24px;height:24px;border-radius:6px;background:var(--ink);color:var(--parchment);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.qtitle{font-family:var(--font-d);font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.qdesc{font-size:12px;color:var(--muted);line-height:1.4;}
+.qrev{display:inline-block;font-size:10px;font-weight:600;letter-spacing:1px;background:rgba(192,82,74,.08);color:var(--rose);border:1px solid rgba(192,82,74,.2);border-radius:4px;padding:2px 6px;margin-top:4px;}
+
+/* SLIDER */
+.srow{display:flex;align-items:center;gap:10px;}
+.srow input[type=range]{flex:1;appearance:none;height:5px;background:var(--border);border-radius:3px;outline:none;cursor:pointer;}
+.srow input[type=range]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:var(--ink);border:3px solid var(--saffron2);cursor:pointer;transition:transform .15s;}
+.srow input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
+.snum{min-width:30px;text-align:center;font-family:var(--font-d);font-size:1rem;font-weight:700;color:var(--saffron);}
+.sends{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px;font-weight:500;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 24px;border-radius:var(--r);font-family:var(--font-b);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;border:none;letter-spacing:.3px;}
+.btn-ink{background:var(--ink);color:var(--parchment);box-shadow:3px 3px 0 var(--saffron);}
+.btn-ink:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--saffron);}
+.btn-ink:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--saffron);}
+.btn-out{background:transparent;color:var(--ink);border:1.5px solid var(--border);}
+.btn-out:hover{border-color:var(--ink);background:var(--warm);}
+.btn-sage{background:var(--sage);color:#fff;box-shadow:3px 3px 0 rgba(90,138,106,.35);}
+.btn-sage:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 rgba(90,138,106,.35);}
+.btn-full{width:100%;}
+.brow{display:flex;gap:10px;margin-top:20px;}
+.brow .btn-ink{flex:2;}.brow .btn-out{flex:1;}
+
+/* WORK HERO */
+.work-hero{background:var(--ink);color:var(--parchment);border-radius:var(--rl);padding:26px;margin-bottom:16px;position:relative;overflow:hidden;}
+.work-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:rgba(232,135,10,.08);pointer-events:none;}
+.wlabel{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--saffron2);margin-bottom:4px;}
+.wnum{font-family:var(--font-d);font-size:3.8rem;font-weight:900;color:var(--saffron2);line-height:1;}
+.wunit{font-size:13px;color:rgba(245,239,230,.5);margin-top:5px;}
+.wbreaks{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px;}
+.wbi{background:rgba(255,255,255,.05);border-radius:10px;padding:10px;text-align:center;}
+.wbv{font-family:var(--font-d);font-size:1.1rem;font-weight:700;color:var(--saffron2);}
+.wbl{font-size:10px;color:rgba(245,239,230,.4);margin-top:2px;letter-spacing:.5px;}
+
+/* RULE BOX */
+.rule-box{border:2px solid var(--saffron);border-radius:var(--r);padding:16px 18px;margin:14px 0;background:rgba(232,135,10,.03);}
+.rule-box h4{font-family:var(--font-d);font-size:1rem;font-weight:700;margin-bottom:5px;color:var(--ink);}
+.rule-box p{font-size:12px;color:var(--muted);line-height:1.5;}
+.rtimer{font-family:var(--font-d);font-size:2rem;font-weight:700;color:var(--saffron);margin:8px 0 4px;}
+
+/* PLATFORM LINKS */
+.platforms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.platbtn{display:flex;align-items:center;justify-content:center;gap:5px;padding:10px;border-radius:var(--r);border:1.5px solid var(--border);background:var(--cream);cursor:pointer;transition:all .2s;font-size:11px;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:.5px;}
+.platbtn:hover{border-color:var(--ink);background:var(--warm);transform:translateY(-1px);}
+
+/* RESULT */
+.res-hero{background:var(--ink);border-radius:var(--rxl);padding:32px 24px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden;}
+.res-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(232,135,10,.14),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(90,138,106,.09),transparent 60%);pointer-events:none;}
+.res-emoji{font-size:3.2rem;display:block;margin-bottom:8px;position:relative;}
+.res-cat{font-family:var(--font-d);font-size:2.8rem;font-weight:900;letter-spacing:-1px;position:relative;line-height:1;}
+.cat-need{color:var(--sage2);}
+.cat-want{color:var(--saffron2);}
+.cat-luxury{color:var(--rose2);}
+.res-item{color:rgba(245,239,230,.5);font-size:13px;margin-top:6px;position:relative;}
+.res-text{position:relative;margin-top:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:14px;font-size:13px;line-height:1.7;color:rgba(245,239,230,.8);}
+
+/* SCORE TRIO */
+.strio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+.stile{background:var(--parchment);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center;box-shadow:var(--sh);}
+.stile .val{font-family:var(--font-d);font-size:1.8rem;font-weight:900;}
+.stile .lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+
+/* SCORE BARS */
+.sbar{margin-bottom:16px;}
+.sbar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.sbar-name{font-size:12px;font-weight:500;}
+.sbar-num{font-family:var(--font-d);font-size:13px;font-weight:700;color:var(--saffron);}
+.sbar-track{height:9px;background:var(--border);border-radius:5px;overflow:hidden;}
+.sbar-fill{height:100%;border-radius:5px;transition:width 1s cubic-bezier(.4,0,.2,1);width:0%;}
+
+/* RECS */
+.ritem{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border2);font-size:13px;line-height:1.5;}
+.ritem:last-child{border-bottom:none;}
+.ri{font-size:17px;flex-shrink:0;margin-top:1px;}
+
+/* ALERTS */
+.alert{border-radius:var(--r);padding:12px 15px;font-size:12px;line-height:1.5;margin-bottom:12px;display:flex;gap:9px;align-items:flex-start;}
+.alert-warn{background:rgba(232,135,10,.07);border:1px solid rgba(232,135,10,.25);color:#a06010;}
+.alert-good{background:rgba(90,138,106,.07);border:1px solid rgba(90,138,106,.25);color:var(--sage);}
+.alert-bad{background:rgba(192,82,74,.07);border:1px solid rgba(192,82,74,.25);color:var(--rose);}
+.alert-info{background:rgba(74,122,181,.07);border:1px solid rgba(74,122,181,.25);color:var(--sky);}
+
+/* LOCK BAR */
+.lock-bar{display:flex;align-items:center;gap:9px;font-size:12px;background:rgba(192,82,74,.06);border:1px solid rgba(192,82,74,.2);border-radius:var(--r);padding:11px 14px;margin-bottom:14px;color:var(--rose);}
+
+/* AWARENESS */
+.aw-card{background:var(--ink);color:var(--parchment);border-radius:var(--rl);padding:22px;margin-bottom:16px;}
+.aw-card h3{font-family:var(--font-d);font-size:1.15rem;font-weight:700;margin-bottom:5px;}
+.aw-card p{font-size:12px;color:rgba(245,239,230,.55);margin-bottom:16px;line-height:1.5;}
+.aw-card .srow input[type=range]{background:rgba(255,255,255,.12);}
+.aw-card .srow input[type=range]::-webkit-slider-thumb{background:var(--parchment);border-color:var(--saffron2);}
+.aw-card .snum{color:var(--saffron2);}
+.aw-card .sends{color:rgba(245,239,230,.35);}
+
+/* TRACKER */
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.chart-wrap{max-width:240px;margin:0 auto;}
+canvas#pie{width:100%!important;}
+.txitem{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border2);}
+.txitem:last-child{border-bottom:none;}
+.txdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.txinfo{flex:1;}
+.txname{font-size:13px;font-weight:600;}
+.txcat{font-size:11px;color:var(--muted);}
+.txamt{font-family:var(--font-d);font-weight:700;color:var(--rose);font-size:14px;}
+.txdel{font-size:16px;cursor:pointer;color:var(--muted);transition:color .2s;padding:4px;}
+.txdel:hover{color:var(--rose);}
+.legend-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-weight:500;}
+.ldot{width:9px;height:9px;border-radius:50%;}
+
+/* HISTORY */
+.hitem{background:var(--parchment);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh);}
+.hleft{display:flex;align-items:center;gap:12px;}
+.hicon{font-size:1.4rem;}
+.hname{font-family:var(--font-d);font-size:14px;font-weight:700;}
+.hmeta{font-size:11px;color:var(--muted);margin-top:2px;}
+.hbadge{font-size:10px;font-weight:700;letter-spacing:1px;padding:4px 10px;border-radius:100px;text-transform:uppercase;}
+.hb-need{background:rgba(90,138,106,.12);color:var(--sage);}
+.hb-want{background:rgba(232,135,10,.12);color:var(--saffron);}
+.hb-luxury{background:rgba(192,82,74,.12);color:var(--rose);}
+
+/* PRICE HIST */
+.phi{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border2);font-size:13px;}
+.phi:last-child{border-bottom:none;}
+.phi-date{color:var(--muted);font-size:11px;}
+.phi-price{font-family:var(--font-d);font-weight:700;}
+.phi-src{font-size:11px;color:var(--sky);}
+
+/* URL ROW */
+.url-row{display:flex;gap:7px;}
+.url-row input{flex:1;}
+.url-row .btn{padding:12px 14px;font-size:12px;flex-shrink:0;}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty .ei{font-size:2.8rem;display:block;margin-bottom:12px;}
+.empty h3{font-family:var(--font-d);font-size:1.1rem;color:var(--ink);margin-bottom:5px;}
+.empty p{font-size:13px;line-height:1.5;}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--parchment);padding:11px 20px;border-radius:100px;font-size:13px;font-weight:600;z-index:99999;animation:fu .3s ease;white-space:nowrap;box-shadow:var(--sh2);}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .frow,.tgrid,.strio{grid-template-columns:1fr;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .pgrid{grid-template-columns:repeat(3,1fr);}
+  .platforms{grid-template-columns:1fr 1fr;}
+  .brow{flex-direction:column-reverse;}
+  .wbreaks{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ═══ MASTHEAD ═══ -->
+<div class="deco"></div>
+<div class="masthead">
+  <span class="kicker">✦ Student Financial Clarity Tool ✦</span>
+  <h1>Smart<em>Buy</em></h1>
+  <p>Turn price tags into real work-time. Make purchases you'll never regret.</p>
+  <div class="dateline" id="dateline"></div>
+</div>
+<div class="deco-thin"></div>
+
+<!-- QUOTE BAR -->
+<div class="quote-bar">
+  <q id="qt"></q>
+  <span class="q-attr" id="qa"></span>
+</div>
+<div class="deco"></div>
+
+<!-- NAV -->
+<div class="nav-strip">
+  <button class="ntab active" onclick="tab('advisor')">🧠 Advisor</button>
+  <button class="ntab" onclick="tab('tracker')">💰 Tracker</button>
+  <button class="ntab" onclick="tab('history')">📋 History</button>
+  <button class="ntab" onclick="tab('profile')">👤 Profile</button>
+</div>
+
+<!-- ═══ ADVISOR TAB ═══ -->
+<div id="tab-advisor" class="tab-pane active">
+  <div class="prog-wrap">
+    <div class="prog-top"><span id="sl">Step 1 of 5</span><span id="sp">0%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+  </div>
+
+  <!-- S1: PROFILE -->
+  <div class="screen active" id="scr-profile">
+    <div class="card">
+      <span class="card-kicker">Step 1 — Financial Profile</span>
+      <h2 class="card-h">Tell us about your money</h2>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.6">Stored only on your device. Used to calculate the real work-time cost of every purchase.</p>
+      <div class="field"><label>Your First Name</label><input type="text" id="p-name" placeholder="e.g. Aathish"/></div>
+      <div class="srule">Monthly Income</div>
+      <div class="frow">
+        <div class="field"><label>Pocket Money / Month (₹)</label><input type="number" id="p-pocket" placeholder="5000" min="0"/><p class="fhint">Regular monthly allowance</p></div>
+        <div class="field"><label>Part-time / Freelance (₹)</label><input type="number" id="p-part" placeholder="0" min="0"/></div>
+      </div>
+      <div class="field"><label>Current Savings Balance (₹)</label><input type="number" id="p-save" placeholder="8000" min="0"/></div>
+      <div class="srule">Monthly Essential Expenses</div>
+      <div class="frow">
+        <div class="field"><label>Food & Daily Needs (₹)</label><input type="number" id="p-food" placeholder="2500" min="0"/></div>
+        <div class="field"><label>Transport (₹)</label><input type="number" id="p-trans" placeholder="500" min="0"/></div>
+      </div>
+      <div class="frow">
+        <div class="field"><label>Study Materials / Month (₹)</label><input type="number" id="p-study" placeholder="300" min="0"/></div>
+        <div class="field"><label>Other Fixed Costs (₹)</label><input type="number" id="p-other" placeholder="200" min="0"/></div>
+      </div>
+      <div class="srule">Budget Lock</div>
+      <div class="field">
+        <label>Monthly Purchase Limit (₹) <span style="color:var(--rose);font-size:10px">LOCK</span></label>
+        <input type="number" id="p-budget" placeholder="e.g. 1000 — 0 to disable" min="0"/>
+        <p class="fhint">If you hit this limit, new purchases get flagged. Set 0 to disable.</p>
+      </div>
+      <div id="prof-sum" style="display:none">
+        <div class="srule">Summary</div>
+        <div class="stat-grid">
+          <div class="stat-box"><div class="stat-v" id="si">—</div><div class="stat-l">Monthly Income</div></div>
+          <div class="stat-box"><div class="stat-v" id="se">—</div><div class="stat-l">Monthly Expenses</div></div>
+          <div class="stat-box"><div class="stat-v" id="sf">—</div><div class="stat-l">Free / Month</div></div>
+          <div class="stat-box"><div class="stat-v" id="sd">—</div><div class="stat-l">Free / Day</div></div>
+        </div>
+        <div id="prof-alert" class="alert" style="margin-top:12px"></div>
+      </div>
+      <div class="brow"><button class="btn btn-ink btn-full" onclick="saveProfile()">Save & Continue →</button></div>
+    </div>
+  </div>
+
+  <!-- S2: PRODUCT -->
+  <div class="screen" id="scr-product">
+    <div id="lock-bar" class="lock-bar" style="display:none"><span>🔒</span><span id="lock-msg"></span></div>
+    <div class="card">
+      <span class="card-kicker">Step 2 — The Item</span>
+      <h2 class="card-h">What do you want to buy?</h2>
+      <div class="srule">Price</div>
+      <div class="field"><label>Item Price (₹)</label><input type="number" id="item-price" placeholder="Enter the price you've seen" min="0"/></div>
+      <div class="field">
+        <label>Product URL (Optional — Flipkart / Amazon / Meesho)</label>
+        <div class="url-row">
+          <input type="url" id="item-url" placeholder="https://www.flipkart.com/…"/>
+          <button class="btn btn-out" onclick="parseURL()">↗ Detect</button>
+        </div>
+        <p class="fhint" id="url-hint">Paste a link to get platform comparison links and auto-select category.</p>
+      </div>
+      <div class="srule">Category</div>
+      <div class="pgrid" id="pgrid"></div>
+      <div id="plat-section" style="display:none">
+        <div class="srule">Compare on All Platforms</div>
+        <div class="platforms" id="plat-links"></div>
+        <p class="fhint" style="margin-top:7px">Opens search results on each platform. Compare before buying.</p>
+      </div>
+      <div id="ph-section" style="display:none">
+        <div class="srule">Price History (Manual Log)</div>
+        <ul id="ph-list" style="list-style:none"></ul>
+        <div class="frow" style="margin-top:8px">
+          <input type="number" id="ph-price" placeholder="Price seen (₹)" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--cream);font-family:var(--font-b);font-size:14px;outline:none;"/>
+          <input type="text" id="ph-src" placeholder="Source (Flipkart…)" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--cream);font-family:var(--font-b);font-size:14px;outline:none;"/>
+        </div>
+        <button class="btn btn-out" style="margin-top:9px;font-size:12px;padding:8px 14px" onclick="logPrice()">+ Log This Price</button>
+      </div>
+      <div class="brow">
+        <button class="btn btn-ink" onclick="gotoQ()">Start Evaluation →</button>
+        <button class="btn btn-out" onclick="gotoS('scr-profile')">← Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- S3: QUESTIONS -->
+  <div class="screen" id="scr-q">
+    <div id="q-container"></div>
+    <div class="brow">
+      <button class="btn btn-ink" onclick="gotoAw()">Calculate Work-Time →</button>
+      <button class="btn btn-out" onclick="gotoS('scr-product')">← Back</button>
+    </div>
+  </div>
+
+  <!-- S4: AWARENESS -->
+  <div class="screen" id="scr-aw">
+    <div class="work-hero">
+      <div class="wlabel">This purchase will cost you</div>
+      <div class="wnum" id="wh-num">—</div>
+      <div class="wunit" id="wh-unit">days of free money</div>
+      <div class="wbreaks">
+        <div class="wbi"><div class="wbv" id="wh-d">—</div><div class="wbl">Days saving</div></div>
+        <div class="wbi"><div class="wbv" id="wh-p">—</div><div class="wbl">% of free cash</div></div>
+        <div class="wbi"><div class="wbv" id="wh-w">—</div><div class="wbl">Weeks to save</div></div>
+      </div>
+    </div>
+    <div class="rule-box">
+      <h4>⏳ The 24-Hour Buying Rule</h4>
+      <p>Behavioural finance: waiting 24 hours before any non-essential purchase eliminates ~60% of impulse buys.</p>
+      <div class="rtimer" id="rtimer">24:00:00</div>
+      <p style="font-size:11px;color:var(--muted)">If the timer ends and you still want it — it's likely a genuine want, not an impulse.</p>
+      <button class="btn btn-out" style="margin-top:9px;font-size:12px;padding:8px 14px" onclick="startTimer()">▶ Start 24-hr Timer</button>
+    </div>
+    <div class="aw-card">
+      <h3>Awareness Check ★</h3>
+      <p>Now that you see the real time-cost — how justified does this purchase actually feel?</p>
+      <div style="font-size:13px;color:rgba(245,239,230,.8);margin-bottom:12px;line-height:1.5">Knowing it costs <strong id="aw-remind" style="color:var(--saffron2)">X days</strong> of your free money — how justified does spending it feel?</div>
+      <div class="srow">
+        <input type="range" min="0" max="10" value="5" id="aw-slider" oninput="document.getElementById('aw-v').textContent=this.value">
+        <div class="snum" id="aw-v">5</div>
+      </div>
+      <div class="sends"><span>0 — Not worth it</span><span>5 — Maybe</span><span>10 — Absolutely</span></div>
+    </div>
+    <div class="brow">
+      <button class="btn btn-ink" onclick="calcResult()">Get My Verdict →</button>
+      <button class="btn btn-out" onclick="gotoS('scr-q')">← Back</button>
+    </div>
+  </div>
+
+  <!-- S5: RESULT -->
+  <div class="screen" id="scr-result">
+    <div class="res-hero">
+      <span class="res-emoji" id="res-e">🤔</span>
+      <div class="res-cat" id="res-c">—</div>
+      <div class="res-item" id="res-i">—</div>
+      <div class="res-text" id="res-t">—</div>
+    </div>
+    <div class="strio">
+      <div class="stile"><div class="val" id="sc-ps" style="color:var(--sky)">—</div><div class="lbl">Psych Score</div></div>
+      <div class="stile"><div class="val" id="sc-d" style="color:var(--saffron)">—</div><div class="lbl">Days Cost</div></div>
+      <div class="stile"><div class="val" id="sc-f" style="color:var(--sage)">—</div><div class="lbl">Final Score</div></div>
+    </div>
+    <div class="card">
+      <span class="card-kicker">Score Breakdown</span>
+      <div id="sbars"></div>
+    </div>
+    <div class="card">
+      <span class="card-kicker">Recommendations</span>
+      <div id="recs"></div>
+    </div>
+    <div class="brow">
+      <button class="btn btn-ink" onclick="startNew()">Evaluate Another</button>
+      <button class="btn btn-out" onclick="logToTracker()">+ Add to Tracker</button>
+    </div>
+  </div>
+</div><!-- /advisor -->
+
+<!-- ═══ TRACKER TAB ═══ -->
+<div id="tab-tracker" class="tab-pane">
+  <div class="card">
+    <span class="card-kicker">Monthly Overview</span>
+    <div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="stat-box"><div class="stat-v" id="tr-tot" style="color:var(--rose)">₹0</div><div class="stat-l">Total Spent</div></div>
+      <div class="stat-box"><div class="stat-v" id="tr-rem" style="color:var(--sage)">₹—</div><div class="stat-l">Budget Left</div></div>
+      <div class="stat-box"><div class="stat-v" id="tr-cnt">0</div><div class="stat-l">Transactions</div></div>
+    </div>
+  </div>
+  <div class="tgrid">
+    <div class="card">
+      <span class="card-kicker">By Category</span>
+      <div class="chart-wrap"><canvas id="pie" width="240" height="240"></canvas></div>
+      <div class="legend-grid" id="legend"></div>
+    </div>
+    <div class="card">
+      <span class="card-kicker">Add Expense</span>
+      <div class="field"><label>Item Name</label><input type="text" id="tx-name" placeholder="e.g. Lunch, Bus pass"/></div>
+      <div class="field"><label>Amount (₹)</label><input type="number" id="tx-amt" placeholder="0" min="0"/></div>
+      <div class="field"><label>Category</label>
+        <select id="tx-cat">
+          <option value="food">🍚 Food</option>
+          <option value="transport">🚌 Transport</option>
+          <option value="study">📚 Study</option>
+          <option value="tech">💻 Tech / Gadgets</option>
+          <option value="entertainment">🎮 Entertainment</option>
+          <option value="clothing">👕 Clothing</option>
+          <option value="health">💊 Health</option>
+          <option value="other">📦 Other</option>
+        </select>
+      </div>
+      <button class="btn btn-ink btn-full" onclick="addTx()">+ Add Expense</button>
+    </div>
+  </div>
+  <div class="card">
+    <span class="card-kicker">Transaction Log</span>
+    <div id="tx-list"><div class="empty"><span class="ei">💸</span><h3>No expenses</h3><p>Add your first expense above.</p></div></div>
+    <button class="btn btn-out" style="margin-top:12px;font-size:11px;padding:7px 14px" onclick="clearTx()">🗑 Clear All</button>
+  </div>
+</div>
+
+<!-- ═══ HISTORY TAB ═══ -->
+<div id="tab-history" class="tab-pane">
+  <div id="hist-list"><div class="empty"><span class="ei">📋</span><h3>No evaluations yet</h3><p>Evaluate a purchase in the Advisor tab.</p></div></div>
+</div>
+
+<!-- ═══ PROFILE TAB ═══ -->
+<div id="tab-profile" class="tab-pane">
+  <div id="prof-view"><div class="empty"><span class="ei">👤</span><h3>No profile yet</h3><p>Set up your profile in the Advisor tab.</p></div></div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ── QUOTES ──────────────────────────────────────────────────
+const QUOTES=[
+  {q:"Do not save what is left after spending, but spend what is left after saving.",a:"Warren Buffett"},
+  {q:"Beware of little expenses. A small leak will sink a great ship.",a:"Benjamin Franklin"},
+  {q:"The habit of saving is itself an education; it fosters every virtue.",a:"T.T. Munger"},
+  {q:"A budget is telling your money where to go instead of wondering where it went.",a:"Dave Ramsey"},
+  {q:"Financial freedom is available to those who learn about it and work for it.",a:"Robert Kiyosaki"},
+  {q:"Too many people spend money they haven't earned to buy things they don't want.",a:"Will Rogers"},
+  {q:"If you buy things you do not need, soon you will have to sell things you need.",a:"Warren Buffett"},
+  {q:"An investment in knowledge pays the best interest.",a:"Benjamin Franklin"},
+  {q:"Wealth consists not in having great possessions, but in having few wants.",a:"Epictetus"},
+  {q:"Stop buying things you don't need to impress people you don't like.",a:"Dave Ramsey"},
+  {q:"Every purchase you don't make is money you get to keep.",a:"Anonymous"},
+  {q:"Mindful spending is the foundation of financial peace.",a:"Anonymous"},
+  {q:"Before you spend, think. Before you borrow, think twice.",a:"Proverb"},
+  {q:"The best way to feel rich is to spend less money.",a:"Anonymous"},
+  {q:"Your future self is watching your spending decisions.",a:"Anonymous"},
+];
+
+// ── PRODUCTS ─────────────────────────────────────────────────
+const PRODS=[
+  {id:'laptop',name:'Laptop',icon:'💻'},
+  {id:'smartphone',name:'Smartphone',icon:'📱'},
+  {id:'headphones',name:'Headphones',icon:'🎧'},
+  {id:'keyboard',name:'Keyboard',icon:'⌨️'},
+  {id:'mouse',name:'Mouse',icon:'🖱️'},
+  {id:'tablet',name:'Tablet',icon:'📲'},
+  {id:'smartwatch',name:'Smartwatch',icon:'⌚'},
+  {id:'console',name:'Console',icon:'🎮'},
+  {id:'bicycle',name:'Bicycle',icon:'🚲'},
+  {id:'backpack',name:'Backpack',icon:'🎒'},
+  {id:'camera',name:'Camera',icon:'📷'},
+  {id:'other',name:'Other',icon:'📦'},
+];
+
+// ── IMPROVED QUESTIONS (from C-program spec) ─────────────────
+const QG=[
+  {t:"Necessity",        q:"How much would your daily life or studies be affected if you did NOT buy this?",reverse:false},
+  {t:"Substitute",       q:"Do you already own something serving the same purpose? (0=perfect substitute exists, 10=nothing can replace it)",reverse:false},
+  {t:"Urgency",          q:"How urgently do you need this right now?",reverse:false},
+  {t:"Usage Duration",   q:"How likely are you to use this regularly for the next 6+ months?",reverse:false},
+  {t:"Emotional Drive",  q:"How much is this driven by emotion, impulse, or current mood?",reverse:true},
+  {t:"Social Influence", q:"How much is this influenced by others owning it or social trends?",reverse:true},
+  {t:"Financial Comfort",q:"How easily can you afford this WITHOUT affecting savings or essential expenses?",reverse:false},
+  {t:"Replacement Need", q:"Is this replacing something broken, unusable, or lost?",reverse:false},
+  {t:"Opportunity Cost", q:"How confident that spending here will NOT cause regret over the next month?",reverse:false},
+  {t:"Delayed Desire",   q:"If you waited ONE WEEK, how likely would you still want it equally?",reverse:false},
+];
+const QOVER={
+  laptop:[
+    {t:"Academic Necessity",q:"How essential is a laptop for your daily coursework and studies?"},
+    {t:"Current Device State",q:"How poor is your current device performance for your academic needs?"},
+    {t:"Daily Usage",q:"How many hours daily would you realistically use this laptop?"},
+    {t:"Course Requirement",q:"Does your course or internship specifically require better hardware?"},
+  ],
+  smartphone:[
+    {t:"Phone Condition",q:"How poor is your current phone's condition (battery, storage, performance)?"},
+    {t:"Study Impact",q:"How much does your current phone limit your study or communication?"},
+    {t:"Feature Need",q:"Are the new features genuinely needed for your academic/work life?"},
+    {t:"Longevity",q:"Will this phone realistically last you 3+ years?"},
+  ],
+  headphones:[
+    {t:"Study Use",q:"How often would you use these for studying, calls, or online classes?"},
+    {t:"Current Audio",q:"How inadequate is your current audio setup?"},
+    {t:"Focus Need",q:"Do you genuinely need noise cancellation to focus better in your environment?"},
+    {t:"Purpose",q:"Is this primarily for studying vs. entertainment?"},
+  ],
+  console:[
+    {t:"Entertainment Value",q:"How significantly would this improve your stress-relief and downtime?"},
+    {t:"Study Risk",q:"How likely is this to negatively affect your studies or sleep schedule?"},
+    {t:"Alternatives",q:"Do you already own other gaming devices (PC, phone, older console)?"},
+    {t:"Time Control",q:"How confident are you in controlling your gaming time?"},
+  ],
+};
+
+// ── CATEGORY COLORS ──────────────────────────────────────────
+const CCLR={food:'#e8870a',transport:'#4a7ab5',study:'#5a8a6a',tech:'#8b5cf6',entertainment:'#c0524a',clothing:'#f59e0b',health:'#10b981',other:'#6b7280'};
+const CICO={food:'🍚',transport:'🚌',study:'📚',tech:'💻',entertainment:'🎮',clothing:'👕',health:'💊',other:'📦'};
+
+// ── STATE ─────────────────────────────────────────────────────
+let profile=JSON.parse(localStorage.getItem('sb_p')||'null');
+let history=JSON.parse(localStorage.getItem('sb_h')||'[]');
+let txs=JSON.parse(localStorage.getItem('sb_tx')||'[]');
+let ph=JSON.parse(localStorage.getItem('sb_ph')||'{}');
+let selProd=null,itemPrice=0,slVals=Array(10).fill(5),awVal=5,lastRes=null,monthSpent=0,tmrInt=null;
+
+// ── INIT ──────────────────────────────────────────────────────
+window.onload=()=>{
+  document.getElementById('dateline').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+  const qr=QUOTES[Math.floor(Math.random()*QUOTES.length)];
+  document.getElementById('qt').textContent=qr.q;
+  document.getElementById('qa').textContent='— '+qr.a;
+  buildGrid();
+  calcMonthSpent();
+  renderTx();
+  if(profile){gotoS('scr-product');setP(2,5);checkLock();}
+  // resume timer
+  const tend=+localStorage.getItem('sb_tend')||0;
+  if(tend>Date.now()){tickTimer();tmrInt=setInterval(tickTimer,1000);}
+};
+
+// ── TABS ──────────────────────────────────────────────────────
+function tab(id){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  ['advisor','tracker','history','profile'].forEach((n,i)=>{if(n===id)document.querySelectorAll('.ntab')[i].classList.add('active');});
+  if(id==='history')renderHist();
+  if(id==='profile')renderProf();
+  if(id==='tracker'){calcMonthSpent();renderTx();}
+}
+
+// ── PROGRESS ──────────────────────────────────────────────────
+function setP(s,t){const p=Math.round(s/t*100);document.getElementById('pf').style.width=p+'%';document.getElementById('sl').textContent=`Step ${s} of ${t}`;document.getElementById('sp').textContent=p+'%';}
+
+// ── SCREENS ───────────────────────────────────────────────────
+function gotoS(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+
+// ── PROFILE ───────────────────────────────────────────────────
+function saveProfile(){
+  const name=document.getElementById('p-name').value.trim()||'Student';
+  const pocket=+document.getElementById('p-pocket').value||0;
+  const part=+document.getElementById('p-part').value||0;
+  const save=+document.getElementById('p-save').value||0;
+  const food=+document.getElementById('p-food').value||0;
+  const trans=+document.getElementById('p-trans').value||0;
+  const study=+document.getElementById('p-study').value||0;
+  const other=+document.getElementById('p-other').value||0;
+  const budget=+document.getElementById('p-budget').value||0;
+  const inc=pocket+part,exp=food+trans+study+other,free=inc-exp,daily=free/30;
+  document.getElementById('si').textContent='₹'+f(inc);
+  document.getElementById('se').textContent='₹'+f(exp);
+  document.getElementById('sf').textContent='₹'+f(free);
+  document.getElementById('sd').textContent='₹'+f(Math.round(daily));
+  document.getElementById('prof-sum').style.display='block';
+  const al=document.getElementById('prof-alert');
+  if(free<=0){al.className='alert alert-bad';al.innerHTML='⚠️ Expenses exceed income. Any purchase needs very careful consideration.';}
+  else if(free<1000){al.className='alert alert-warn';al.innerHTML='⚠️ Very limited free cash. Prioritise carefully.';}
+  else{al.className='alert alert-good';al.innerHTML=`✅ You have ₹${f(free)} free/month (₹${f(Math.round(daily))}/day).`;}
+  profile={name,pocket,part,save,food,trans,study,other,budget,totalIncome:inc,totalExpense:exp,freeMonthly:free,freeDaily:daily};
+  localStorage.setItem('sb_p',JSON.stringify(profile));
+  setP(2,5);checkLock();gotoS('scr-product');
+}
+
+function checkLock(){
+  if(!profile)return;
+  calcMonthSpent();
+  const bar=document.getElementById('lock-bar');
+  const msg=document.getElementById('lock-msg');
+  if(!profile.budget||profile.budget<=0){bar.style.display='none';return;}
+  bar.style.display='flex';
+  if(monthSpent>=profile.budget){bar.style.background='rgba(192,82,74,.07)';bar.style.borderColor='rgba(192,82,74,.2)';bar.style.color='var(--rose)';msg.textContent=`🔒 Budget limit reached: ₹${f(monthSpent)} spent of ₹${f(profile.budget)} this month.`;}
+  else{bar.style.background='rgba(90,138,106,.06)';bar.style.borderColor='rgba(90,138,106,.2)';bar.style.color='var(--sage)';msg.textContent=`✅ Budget: ₹${f(monthSpent)} of ₹${f(profile.budget)} spent. ₹${f(profile.budget-monthSpent)} remaining.`;}
+}
+
+function calcMonthSpent(){const m=new Date().getMonth(),y=new Date().getFullYear();monthSpent=txs.filter(t=>{const d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y;}).reduce((s,t)=>s+t.amount,0);}
+
+// ── PRODUCT GRID ──────────────────────────────────────────────
+function buildGrid(){
+  document.getElementById('pgrid').innerHTML=PRODS.map(p=>`<div class="pcard" id="pc-${p.id}" onclick="selProd2('${p.id}')"><span class="picon">${p.icon}</span><div class="pname">${p.name}</div></div>`).join('');
+}
+function selProd2(id){selProd=id;document.querySelectorAll('.pcard').forEach(c=>c.classList.remove('sel'));document.getElementById('pc-'+id).classList.add('sel');showPlat(id);showPH(id);}
+
+// ── URL PARSER ────────────────────────────────────────────────
+function parseURL(){
+  const url=document.getElementById('item-url').value.trim();
+  if(!url){toast('Paste a product URL first');return;}
+  const hint=document.getElementById('url-hint');
+  let plat='unknown';
+  if(url.includes('flipkart.com'))plat='Flipkart';
+  else if(url.includes('amazon.in')||url.includes('amazon.com'))plat='Amazon';
+  else if(url.includes('meesho.com'))plat='Meesho';
+  else if(url.includes('croma.com'))plat='Croma';
+  hint.innerHTML=`✅ Detected: <strong>${plat}</strong>. Prices can't be scraped in browser — use Compare section below to check all platforms.`;
+  hint.style.color='var(--sage)';
+  // Auto-select category
+  const ul=url.toLowerCase();
+  for(const p of PRODS){if(ul.includes(p.id)||ul.includes(p.name.toLowerCase())){selProd2(p.id);break;}}
+}
+
+// ── PLATFORM LINKS ────────────────────────────────────────────
+function showPlat(id){
+  const prod=PRODS.find(p=>p.id===id);
+  const q=encodeURIComponent(prod.name);
+  const platforms=[
+    {n:'Flipkart',ic:'🛒',u:`https://www.flipkart.com/search?q=${q}`},
+    {n:'Amazon',  ic:'📦',u:`https://www.amazon.in/s?k=${q}`},
+    {n:'Meesho',  ic:'🛍️',u:`https://meesho.com/search?q=${q}`},
+    {n:'Croma',   ic:'⚡',u:`https://www.croma.com/searchB?q=${q}`},
+    {n:'Reliance',ic:'🏪',u:`https://www.reliancedigital.in/search?q=${q}`},
+    {n:'Snapdeal',ic:'🔖',u:`https://www.snapdeal.com/search?keyword=${q}`},
+  ];
+  document.getElementById('plat-links').innerHTML=platforms.map(p=>`<a class="platbtn" href="${p.u}" target="_blank" rel="noopener"><span>${p.ic}</span>${p.n}</a>`).join('');
+  document.getElementById('plat-section').style.display='block';
+}
+
+// ── PRICE HISTORY ─────────────────────────────────────────────
+function showPH(id){document.getElementById('ph-section').style.display='block';renderPH(id);}
+function renderPH(id){
+  const list=ph[id]||[];
+  const ul=document.getElementById('ph-list');
+  if(!list.length){ul.innerHTML=`<li class="phi" style="color:var(--muted);font-size:12px">No observations yet — log one below.</li>`;return;}
+  ul.innerHTML=list.map((e,i)=>`<li class="phi"><span class="phi-date">${e.date}</span><span class="phi-price">₹${f(e.price)}</span><span class="phi-src">${e.src}</span><span style="cursor:pointer;color:var(--muted);font-size:11px;margin-left:6px" onclick="delPH('${id}',${i})">✕</span></li>`).join('');
+}
+function logPrice(){
+  if(!selProd){toast('Select a category first');return;}
+  const price=+document.getElementById('ph-price').value;
+  const src=document.getElementById('ph-src').value.trim()||'Unknown';
+  if(!price){toast('Enter a price');return;}
+  if(!ph[selProd])ph[selProd]=[];
+  ph[selProd].unshift({price,src,date:new Date().toLocaleDateString('en-IN')});
+  if(ph[selProd].length>10)ph[selProd].pop();
+  localStorage.setItem('sb_ph',JSON.stringify(ph));
+  document.getElementById('ph-price').value='';document.getElementById('ph-src').value='';
+  renderPH(selProd);toast('Price logged!');
+}
+function delPH(pid,i){ph[pid].splice(i,1);localStorage.setItem('sb_ph',JSON.stringify(ph));renderPH(pid);}
+
+// ── GOTO QUESTIONS ────────────────────────────────────────────
+function gotoQ(){
+  if(!selProd){toast('Select a product category');return;}
+  const price=+document.getElementById('item-price').value;
+  if(!price||price<=0){toast('Enter the item price');return;}
+  itemPrice=price;slVals=Array(10).fill(5);
+  const ov=QOVER[selProd]||[];
+  const qs=QG.map((gq,i)=>ov[i]?{t:ov[i].t,q:ov[i].q,reverse:gq.reverse}:gq);
+  const prod=PRODS.find(p=>p.id===selProd);
+  document.getElementById('q-container').innerHTML=`
+    <div class="card" style="margin-bottom:14px">
+      <span class="card-kicker">Step 3 — Psychological Evaluation</span>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:2rem">${prod.icon}</span>
+        <div><div class="card-h">${prod.name}</div><div style="color:var(--muted);font-size:12px">Rate each 0–10 honestly. No one else sees this.</div></div>
+      </div>
+    </div>
+    ${qs.map((q,i)=>`
+      <div class="qblock">
+        <div class="qtop">
+          <div class="qnum">${i+1}</div>
+          <div>
+            <div class="qtitle">${q.t}</div>
+            <div class="qdesc">${q.q}</div>
+            ${q.reverse?'<span class="qrev">⚠ REVERSE — higher = more concern</span>':''}
+          </div>
+        </div>
+        <div class="srow">
+          <input type="range" min="0" max="10" value="5" id="qs${i}" oninput="slVals[${i}]=+this.value;document.getElementById('sv${i}').textContent=this.value">
+          <div class="snum" id="sv${i}">5</div>
+        </div>
+        <div class="sends"><span>0 — Not at all</span><span>5 — Neutral</span><span>10 — Absolutely</span></div>
+      </div>`).join('')}`;
+  setP(3,5);gotoS('scr-q');
+}
+
+// ── GOTO AWARENESS ────────────────────────────────────────────
+function gotoAw(){
+  const fd=profile.freeDaily;
+  const days=fd>0?itemPrice/fd:999;
+  const weeks=days/7;
+  const pct=profile.freeMonthly>0?itemPrice/profile.freeMonthly*100:0;
+  document.getElementById('wh-num').textContent=days.toFixed(1);
+  document.getElementById('wh-unit').textContent=`days of free money (₹${f(Math.round(fd))}/day) to afford ₹${f(itemPrice)}`;
+  document.getElementById('wh-d').textContent=days.toFixed(1)+'d';
+  document.getElementById('wh-p').textContent=Math.min(999,pct).toFixed(0)+'%';
+  document.getElementById('wh-w').textContent=weeks.toFixed(1)+'w';
+  document.getElementById('aw-remind').textContent=days.toFixed(1)+' days';
+  document.getElementById('rtimer').textContent='24:00:00';
+  setP(4,5);gotoS('scr-aw');
+}
+
+// ── 24-HR TIMER ───────────────────────────────────────────────
+function startTimer(){
+  if(tmrInt){clearInterval(tmrInt);tmrInt=null;}
+  localStorage.setItem('sb_tend',(Date.now()+86400000).toString());
+  tickTimer();tmrInt=setInterval(tickTimer,1000);
+  toast('24-hour timer started!');
+}
+function tickTimer(){
+  const end=+localStorage.getItem('sb_tend')||0;
+  const rem=Math.max(0,Math.round((end-Date.now())/1000));
+  const h=String(Math.floor(rem/3600)).padStart(2,'0');
+  const m=String(Math.floor(rem%3600/60)).padStart(2,'0');
+  const s=String(rem%60).padStart(2,'0');
+  const el=document.getElementById('rtimer');if(el)el.textContent=`${h}:${m}:${s}`;
+  if(rem===0&&tmrInt){clearInterval(tmrInt);tmrInt=null;}
+}
+
+// ── CALCULATE RESULT ──────────────────────────────────────────
+function calcResult(){
+  awVal=+document.getElementById('aw-slider').value;
+  const ov=QOVER[selProd]||[];
+  const qs=QG.map((gq,i)=>ov[i]?{t:ov[i].t,q:ov[i].q,reverse:gq.reverse}:gq);
+  let raw=0;qs.forEach((q,i)=>{const v=slVals[i];raw+=q.reverse?(10-v):v;});
+  const psy=(raw/100)*100;
+  const fd=profile.freeDaily;
+  const days=fd>0?itemPrice/fd:999;
+  const pen=Math.min(days*1.5,45);
+  let final=Math.max(0,Math.min(100,psy-pen+(awVal*1.5)));
+  let cat,em,cls,verdict;
+  if(final>=65){cat='NEED';em='✅';cls='cat-need';verdict=`Based on your answers, this purchase has strong justification for ${profile.name}. The need is real and the cost-to-value ratio supports going ahead — provided it fits your budget.`;}
+  else if(final>=38){cat='WANT';em='🤔';cls='cat-want';verdict=`This is a Want, not a necessity right now. Your scores suggest genuine desire but limited urgency. Try the 24-hour rule. If you still feel the same tomorrow, budget for it deliberately.`;}
+  else{cat='LUXURY';em='🚫';cls='cat-luxury';verdict=`This reads as a Luxury — emotionally appealing but not essential. The time-cost is significant relative to your income. Strong recommendation: delay and save for this over 2–3 months.`;}
+  if(profile.budget>0&&monthSpent>=profile.budget)verdict='🔒 BUDGET LOCKED: Monthly limit hit. '+verdict;
+  const prod=PRODS.find(p=>p.id===selProd);
+  document.getElementById('res-e').textContent=em;
+  document.getElementById('res-c').innerHTML=`<span class="${cls}">${cat}</span>`;
+  document.getElementById('res-i').textContent=`${prod.icon} ${prod.name} — ₹${f(itemPrice)}`;
+  document.getElementById('res-t').textContent=verdict;
+  document.getElementById('sc-ps').textContent=Math.round(psy);
+  document.getElementById('sc-d').textContent=days.toFixed(1)+'d';
+  document.getElementById('sc-f').textContent=Math.round(final);
+  const bars=[
+    {n:'Psychological Need Score',v:psy,c:'var(--sky)'},
+    {n:'Time-Cost Penalty',v:Math.min(100,pen/45*100),c:'var(--rose)'},
+    {n:'Awareness & Justification',v:awVal*10,c:'#8b5cf6'},
+    {n:'Final Decision Score',v:final,c:final>=65?'var(--sage2)':final>=38?'var(--saffron2)':'var(--rose2)'},
+  ];
+  document.getElementById('sbars').innerHTML=bars.map(b=>`
+    <div class="sbar">
+      <div class="sbar-top"><span class="sbar-name">${b.n}</span><span class="sbar-num">${Math.round(b.v)}/100</span></div>
+      <div class="sbar-track"><div class="sbar-fill" style="background:${b.c}" data-t="${Math.min(100,b.v).toFixed(1)}"></div></div>
+    </div>`).join('');
+  document.getElementById('recs').innerHTML=buildRecs(cat,days,psy,awVal).map(r=>`<div class="ritem"><span class="ri">${r.i}</span><span>${r.t}</span></div>`).join('');
+  lastRes={id:Date.now(),product:selProd,productName:prod.name,productIcon:prod.icon,price:itemPrice,category:cat,finalScore:Math.round(final),psychScore:Math.round(psy),workDays:days.toFixed(1),date:new Date().toLocaleDateString('en-IN')};
+  history.unshift(lastRes);if(history.length>50)history.pop();localStorage.setItem('sb_h',JSON.stringify(history));
+  setP(5,5);gotoS('scr-result');
+  setTimeout(()=>document.querySelectorAll('.sbar-fill').forEach(el=>el.style.width=el.dataset.t+'%'),300);
+}
+
+function buildRecs(cat,days,psy,aw){
+  const r=[];
+  if(cat==='NEED'){
+    r.push({i:'✅',t:'Your need score justifies this. Go ahead with confidence.'});
+    if(days>15)r.push({i:'💰',t:'Look for student discounts, cashback, or 0% EMI offers to ease the payment.'});
+    r.push({i:'🔍',t:'Compare 2–3 platforms before buying. Price gap can be ₹500–₹2000.'});
+    if(aw<5)r.push({i:'⚡',t:'Your gut felt uncertain (low awareness). Sleep on it tonight before finalising.'});
+  }else if(cat==='WANT'){
+    r.push({i:'⏳',t:'Start the 24-hour timer above. If you still want it tomorrow, it\'s real desire, not impulse.'});
+    r.push({i:'🎯',t:`Save ₹${f(Math.round(itemPrice/30))}/day for ${Math.ceil(days)} days to fund this without stress.`});
+    r.push({i:'🔄',t:'Check if college library, hostel, or a friend has one to borrow temporarily.'});
+    if(days>20)r.push({i:'🛒',t:'Wait for Big Billion Day or Amazon Great Indian Festival — prices drop 20–40%.'});
+  }else{
+    r.push({i:'🚫',t:'Delay this purchase. Both your financial and need scores recommend waiting.'});
+    r.push({i:'🏦',t:`Set a savings goal: ₹${f(Math.round(itemPrice/4))}/month for 4 months. Buy it debt-free.`});
+    r.push({i:'❓',t:'Ask again in 30 days. If you still feel the same and have saved enough — go for it.'});
+    r.push({i:'🤝',t:'Rent, borrow, or find a refurbished version at 40–60% of this price.'});
+    if(profile.budget>0&&monthSpent>=profile.budget)r.push({i:'🔒',t:'Monthly budget limit reached. This purchase is blocked for this month.'});
+  }
+  r.push({i:'📊',t:`This costs ${days.toFixed(1)} days of your free money = ${(days/30*100).toFixed(0)}% of your monthly discretionary budget.`});
+  return r;
+}
+
+// ── LOG TO TRACKER ────────────────────────────────────────────
+function logToTracker(){
+  if(!lastRes)return;
+  txs.unshift({id:Date.now(),name:lastRes.productName,amount:lastRes.price,category:'tech',date:new Date().toISOString()});
+  localStorage.setItem('sb_tx',JSON.stringify(txs));
+  calcMonthSpent();toast('Added to Money Tracker!');tab('tracker');
+}
+
+// ── START NEW ─────────────────────────────────────────────────
+function startNew(){
+  selProd=null;itemPrice=0;slVals=Array(10).fill(5);
+  document.querySelectorAll('.pcard').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('item-price').value='';
+  document.getElementById('item-url').value='';
+  document.getElementById('url-hint').textContent='Paste a link to get platform comparison links and auto-select category.';
+  document.getElementById('url-hint').style.color='';
+  document.getElementById('plat-section').style.display='none';
+  document.getElementById('ph-section').style.display='none';
+  checkLock();setP(2,5);gotoS('scr-product');tab('advisor');
+}
+
+// ── TRACKER ───────────────────────────────────────────────────
+function addTx(){
+  const name=document.getElementById('tx-name').value.trim();
+  const amt=+document.getElementById('tx-amt').value;
+  const cat=document.getElementById('tx-cat').value;
+  if(!name){toast('Enter item name');return;}
+  if(!amt){toast('Enter amount');return;}
+  txs.unshift({id:Date.now(),name,amount:amt,category:cat,date:new Date().toISOString()});
+  localStorage.setItem('sb_tx',JSON.stringify(txs));
+  document.getElementById('tx-name').value='';document.getElementById('tx-amt').value='';
+  calcMonthSpent();renderTx();checkLock();toast('Expense added!');
+}
+function delTx(id){txs=txs.filter(t=>t.id!==id);localStorage.setItem('sb_tx',JSON.stringify(txs));calcMonthSpent();renderTx();}
+function clearTx(){if(!confirm('Clear all transactions?'))return;txs=[];localStorage.setItem('sb_tx',JSON.stringify(txs));calcMonthSpent();renderTx();}
+
+function renderTx(){
+  calcMonthSpent();
+  const total=txs.reduce((s,t)=>s+t.amount,0);
+  document.getElementById('tr-tot').textContent='₹'+f(total);
+  const br=profile&&profile.budget>0?Math.max(0,profile.budget-monthSpent):null;
+  document.getElementById('tr-rem').textContent=br!==null?'₹'+f(br):'₹—';
+  document.getElementById('tr-cnt').textContent=txs.length;
+  drawPie();
+  const el=document.getElementById('tx-list');
+  if(!txs.length){el.innerHTML='<div class="empty"><span class="ei">💸</span><h3>No expenses</h3><p>Add your first expense above.</p></div>';return;}
+  el.innerHTML=txs.slice(0,25).map(t=>`
+    <div class="txitem">
+      <div class="txdot" style="background:${CCLR[t.category]||'#888'}"></div>
+      <div class="txinfo"><div class="txname">${t.name}</div><div class="txcat">${CICO[t.category]||'📦'} ${t.category} · ${new Date(t.date).toLocaleDateString('en-IN')}</div></div>
+      <div class="txamt">-₹${f(t.amount)}</div>
+      <div class="txdel" onclick="delTx(${t.id})">×</div>
+    </div>`).join('');
+}
+
+// ── PIE CHART ─────────────────────────────────────────────────
+function drawPie(){
+  const cv=document.getElementById('pie');if(!cv)return;
+  const ctx=cv.getContext('2d');const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  const tot={};txs.forEach(t=>{tot[t.category]=(tot[t.category]||0)+t.amount;});
+  const ent=Object.entries(tot);const grand=ent.reduce((s,[,v])=>s+v,0);
+  if(!grand){ctx.fillStyle='#d8ccba';ctx.beginPath();ctx.arc(W/2,H/2,W/2-8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fdf8f1';ctx.font='13px Outfit,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('No data',W/2,H/2);document.getElementById('legend').innerHTML='';return;}
+  let ang=-Math.PI/2;const cx=W/2,cy=H/2,r=W/2-6;
+  ent.forEach(([cat,val])=>{const sl=val/grand*Math.PI*2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,ang,ang+sl);ctx.closePath();ctx.fillStyle=CCLR[cat]||'#888';ctx.fill();ctx.strokeStyle='#fdf8f1';ctx.lineWidth=2;ctx.stroke();ang+=sl;});
+  ctx.beginPath();ctx.arc(cx,cy,r*.48,0,Math.PI*2);ctx.fillStyle='#fdf8f1';ctx.fill();
+  ctx.fillStyle='#1a1209';ctx.font=`bold 12px Outfit,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('₹'+f(grand),cx,cy-6);
+  ctx.fillStyle='#8a7a62';ctx.font=`10px Outfit,sans-serif`;ctx.fillText('total',cx,cy+8);
+  document.getElementById('legend').innerHTML=ent.map(([cat,val])=>`<div class="leg"><div class="ldot" style="background:${CCLR[cat]||'#888'}"></div>${CICO[cat]||'📦'} ${cat}: ₹${f(val)}</div>`).join('');
+}
+
+// ── HISTORY ───────────────────────────────────────────────────
+function renderHist(){
+  const el=document.getElementById('hist-list');
+  if(!history.length){el.innerHTML='<div class="empty"><span class="ei">📋</span><h3>No evaluations yet</h3><p>Evaluate a purchase in the Advisor tab.</p></div>';return;}
+  el.innerHTML=history.map(h=>`
+    <div class="hitem">
+      <div class="hleft"><span class="hicon">${h.productIcon}</span><div><div class="hname">${h.productName} — ₹${f(h.price)}</div><div class="hmeta">${h.date} · Psych: ${h.psychScore} · Score: ${h.finalScore}/100 · ${h.workDays}d cost</div></div></div>
+      <span class="hbadge hb-${h.category.toLowerCase()}">${h.category}</span>
+    </div>`).join('');
+}
+
+// ── PROFILE TAB ───────────────────────────────────────────────
+function renderProf(){
+  const el=document.getElementById('prof-view');
+  if(!profile){el.innerHTML='<div class="empty"><span class="ei">👤</span><h3>No profile set</h3><p>Set up in the Advisor tab.</p></div>';return;}
+  el.innerHTML=`
+    <div class="card">
+      <span class="card-kicker">Financial Profile</span>
+      <div style="font-family:var(--font-d);font-size:2rem;font-weight:900;color:var(--ink);margin-bottom:16px">${profile.name}</div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-v">₹${f(profile.totalIncome)}</div><div class="stat-l">Monthly Income</div></div>
+        <div class="stat-box"><div class="stat-v">₹${f(profile.totalExpense)}</div><div class="stat-l">Monthly Expenses</div></div>
+        <div class="stat-box"><div class="stat-v">₹${f(profile.freeMonthly)}</div><div class="stat-l">Free / Month</div></div>
+        <div class="stat-box"><div class="stat-v">₹${f(Math.round(profile.freeDaily))}</div><div class="stat-l">Free / Day</div></div>
+      </div>
+      ${profile.budget>0?`<div class="alert alert-info" style="margin-top:12px">🔒 Purchase budget: ₹${f(profile.budget)}/month. Spent this month: ₹${f(monthSpent)}.</div>`:''}
+      <div class="brow" style="margin-top:16px">
+        <button class="btn btn-out" onclick="editProf()">Edit Profile</button>
+        <button class="btn btn-out" style="color:var(--rose);border-color:rgba(192,82,74,.3)" onclick="clearProf()">🗑 Reset</button>
+      </div>
+    </div>`;
+}
+function editProf(){
+  ['p-name','p-pocket','p-part','p-save','p-food','p-trans','p-study','p-other','p-budget'].forEach((id,i)=>{
+    const vals=[profile.name,profile.pocket,profile.part,profile.save,profile.food,profile.trans,profile.study,profile.other,profile.budget];
+    document.getElementById(id).value=vals[i]||'';
+  });
+  gotoS('scr-profile');tab('advisor');setP(1,5);
+}
+function clearProf(){if(!confirm('Reset profile?'))return;profile=null;localStorage.removeItem('sb_p');renderProf();gotoS('scr-profile');setP(1,5);tab('advisor');}
+
+// ── UTILS ─────────────────────────────────────────────────────
+function f(n){return Number(n).toLocaleString('en-IN');}
+function toast(msg){const o=document.querySelector('.toast');if(o)o.remove();const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),2600);}
+</script>
+</body>
+</html>
