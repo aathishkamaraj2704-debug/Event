@@ -28,10 +28,14 @@
   --font-b: 'Outfit', system-ui, sans-serif;
   --r:  14px;  --rl: 22px;  --rxl: 32px;
   --sh: 0 2px 8px rgba(26,18,9,0.08);
-  --sh2: 0 6px 28px rgba(26,18,9,0.12);
+  --sh2: 0 8px 32px rgba(26,18,9,0.14);
+  --sh3: 0 1px 3px rgba(26,18,9,0.06);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
 body{background:var(--cream);color:var(--text);font-family:var(--font-b);min-height:100vh;overflow-x:hidden;}
+
+/* TEXTURE OVERLAY */
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9998;opacity:.5;}
 
 /* DECO LINES */
@@ -42,7 +46,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .app{max-width:860px;margin:0 auto;padding:0 20px 80px;position:relative;z-index:1;}
 
 /* MASTHEAD */
-.masthead{padding:36px 0 26px;text-align:center;border-bottom:1px solid var(--border);}
+.masthead{padding:36px 0 26px;text-align:center;border-bottom:1px solid var(--border);position:relative;}
 .kicker{font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--saffron);margin-bottom:10px;display:block;}
 .masthead h1{font-family:var(--font-d);font-size:clamp(2.8rem,9vw,5.2rem);font-weight:900;line-height:1;letter-spacing:-1px;color:var(--ink);}
 .masthead h1 em{font-style:italic;color:var(--saffron);}
@@ -50,7 +54,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .dateline{font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-top:12px;font-weight:600;}
 
 /* QUOTE BAR */
-.quote-bar{background:var(--ink);color:var(--parchment);padding:14px 24px;text-align:center;}
+.quote-bar{background:var(--ink);color:var(--parchment);padding:14px 24px;text-align:center;transition:background .3s;}
 .quote-bar q{font-family:var(--font-d);font-style:italic;font-size:14px;quotes:none;}
 .q-attr{font-family:var(--font-b);font-size:11px;color:var(--saffron2);font-weight:700;letter-spacing:1px;margin-top:4px;display:block;}
 
@@ -96,23 +100,35 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
 /* STAT GRID */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;}
-.stat-box{background:var(--cream);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;}
+.stat-box{background:var(--cream);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;transition:transform .2s,box-shadow .2s;}
+.stat-box:hover{transform:translateY(-2px);box-shadow:var(--sh);}
 .stat-v{font-family:var(--font-d);font-size:1.2rem;font-weight:700;color:var(--saffron);}
 .stat-l{font-size:10px;color:var(--muted);margin-top:3px;font-weight:600;line-height:1.3;}
 
 /* PRODUCT GRID */
 .pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
-.pcard{background:var(--cream);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s;}
+.pcard{background:var(--cream);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.pcard::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--saffron),transparent);opacity:0;transition:opacity .2s;}
 .pcard:hover{border-color:var(--saffron);background:var(--parchment);transform:translateY(-2px);box-shadow:var(--sh);}
+.pcard:hover::before{opacity:0.05;}
 .pcard.sel{border-color:var(--saffron);background:rgba(232,135,10,.07);box-shadow:0 0 0 3px rgba(232,135,10,.12);}
-.picon{font-size:1.7rem;display:block;margin-bottom:5px;}
-.pname{font-size:10px;font-weight:700;letter-spacing:.3px;}
+.pcard.sel::before{opacity:0.06;}
+.picon{font-size:1.7rem;display:block;margin-bottom:5px;position:relative;z-index:1;}
+.pname{font-size:10px;font-weight:700;letter-spacing:.3px;position:relative;z-index:1;}
+
+/* WEIGHT BADGE */
+.wbadge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;letter-spacing:.5px;padding:2px 7px;border-radius:4px;margin-top:5px;}
+.wb-high{background:rgba(90,138,106,.1);color:var(--sage);border:1px solid rgba(90,138,106,.2);}
+.wb-med{background:rgba(232,135,10,.1);color:var(--saffron);border:1px solid rgba(232,135,10,.2);}
+.wb-neg{background:rgba(192,82,74,.08);color:var(--rose);border:1px solid rgba(192,82,74,.2);}
 
 /* QUESTIONS */
-.qblock{background:var(--cream);border:1px solid var(--border2);border-radius:var(--r);padding:16px;margin-bottom:10px;transition:border-color .2s;}
-.qblock:hover{border-color:var(--border);}
+.qblock{background:var(--cream);border:1px solid var(--border2);border-radius:var(--r);padding:16px;margin-bottom:10px;transition:border-color .2s,box-shadow .2s;}
+.qblock:hover{border-color:var(--border);box-shadow:var(--sh3);}
+.qblock.q-negative{border-left:3px solid rgba(192,82,74,.3);}
 .qtop{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;}
-.qnum{min-width:24px;height:24px;border-radius:6px;background:var(--ink);color:var(--parchment);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.qnum{min-width:24px;height:24px;border-radius:6px;background:var(--ink);color:var(--parchment);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;}
+.qnum.neg{background:var(--rose);}
 .qtitle{font-family:var(--font-d);font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px;}
 .qdesc{font-size:12px;color:var(--muted);line-height:1.4;}
 .qrev{display:inline-block;font-size:10px;font-weight:600;letter-spacing:1px;background:rgba(192,82,74,.08);color:var(--rose);border:1px solid rgba(192,82,74,.2);border-radius:4px;padding:2px 6px;margin-top:4px;}
@@ -120,7 +136,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* SLIDER */
 .srow{display:flex;align-items:center;gap:10px;}
 .srow input[type=range]{flex:1;appearance:none;height:5px;background:var(--border);border-radius:3px;outline:none;cursor:pointer;}
-.srow input[type=range]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:var(--ink);border:3px solid var(--saffron2);cursor:pointer;transition:transform .15s;}
+.srow input[type=range]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:var(--ink);border:3px solid var(--saffron2);cursor:pointer;transition:transform .15s,background .15s;}
 .srow input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .snum{min-width:30px;text-align:center;font-family:var(--font-d);font-size:1rem;font-weight:700;color:var(--saffron);}
 .sends{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px;font-weight:500;}
@@ -138,14 +154,26 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .brow{display:flex;gap:10px;margin-top:20px;}
 .brow .btn-ink{flex:2;}.brow .btn-out{flex:1;}
 
+/* IMPULSE ALERT */
+.impulse-alert{background:rgba(192,82,74,.05);border:1.5px solid rgba(192,82,74,.3);border-radius:var(--r);padding:13px 16px;margin-bottom:14px;display:none;font-size:12px;color:var(--rose);line-height:1.5;animation:pulse-border 2s infinite;}
+.impulse-alert.show{display:flex;gap:8px;align-items:flex-start;}
+@keyframes pulse-border{0%,100%{border-color:rgba(192,82,74,.3);}50%{border-color:rgba(192,82,74,.6);}}
+
+/* WEIGHT LEGEND */
+.w-legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;padding:12px 14px;background:var(--warm);border-radius:var(--r);border:1px solid var(--border2);}
+.wl-i{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-weight:600;}
+.wl-dot{width:7px;height:7px;border-radius:50%;}
+
 /* WORK HERO */
 .work-hero{background:var(--ink);color:var(--parchment);border-radius:var(--rl);padding:26px;margin-bottom:16px;position:relative;overflow:hidden;}
 .work-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:rgba(232,135,10,.08);pointer-events:none;}
+.work-hero::after{content:'';position:absolute;bottom:-30px;left:-30px;width:140px;height:140px;border-radius:50%;background:rgba(90,138,106,.05);pointer-events:none;}
 .wlabel{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--saffron2);margin-bottom:4px;}
 .wnum{font-family:var(--font-d);font-size:3.8rem;font-weight:900;color:var(--saffron2);line-height:1;}
 .wunit{font-size:13px;color:rgba(245,239,230,.5);margin-top:5px;}
 .wbreaks{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px;}
-.wbi{background:rgba(255,255,255,.05);border-radius:10px;padding:10px;text-align:center;}
+.wbi{background:rgba(255,255,255,.05);border-radius:10px;padding:10px;text-align:center;transition:background .2s;}
+.wbi:hover{background:rgba(255,255,255,.08);}
 .wbv{font-family:var(--font-d);font-size:1.1rem;font-weight:700;color:var(--saffron2);}
 .wbl{font-size:10px;color:rgba(245,239,230,.4);margin-top:2px;letter-spacing:.5px;}
 
@@ -153,17 +181,18 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .rule-box{border:2px solid var(--saffron);border-radius:var(--r);padding:16px 18px;margin:14px 0;background:rgba(232,135,10,.03);}
 .rule-box h4{font-family:var(--font-d);font-size:1rem;font-weight:700;margin-bottom:5px;color:var(--ink);}
 .rule-box p{font-size:12px;color:var(--muted);line-height:1.5;}
-.rtimer{font-family:var(--font-d);font-size:2rem;font-weight:700;color:var(--saffron);margin:8px 0 4px;}
+.rtimer{font-family:var(--font-d);font-size:2rem;font-weight:700;color:var(--saffron);margin:8px 0 4px;font-variant-numeric:tabular-nums;}
 
 /* PLATFORM LINKS */
 .platforms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
 .platbtn{display:flex;align-items:center;justify-content:center;gap:5px;padding:10px;border-radius:var(--r);border:1.5px solid var(--border);background:var(--cream);cursor:pointer;transition:all .2s;font-size:11px;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:.5px;}
-.platbtn:hover{border-color:var(--ink);background:var(--warm);transform:translateY(-1px);}
+.platbtn:hover{border-color:var(--ink);background:var(--warm);transform:translateY(-1px);box-shadow:var(--sh3);}
 
 /* RESULT */
 .res-hero{background:var(--ink);border-radius:var(--rxl);padding:32px 24px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden;}
 .res-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(232,135,10,.14),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(90,138,106,.09),transparent 60%);pointer-events:none;}
-.res-emoji{font-size:3.2rem;display:block;margin-bottom:8px;position:relative;}
+.res-emoji{font-size:3.2rem;display:block;margin-bottom:8px;position:relative;animation:pop .5s cubic-bezier(.4,0,.2,1) both;}
+@keyframes pop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
 .res-cat{font-family:var(--font-d);font-size:2.8rem;font-weight:900;letter-spacing:-1px;position:relative;line-height:1;}
 .cat-need{color:var(--sage2);}
 .cat-want{color:var(--saffron2);}
@@ -171,24 +200,32 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .res-item{color:rgba(245,239,230,.5);font-size:13px;margin-top:6px;position:relative;}
 .res-text{position:relative;margin-top:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:14px;font-size:13px;line-height:1.7;color:rgba(245,239,230,.8);}
 
+/* VERDICT RIBBON */
+.verdict-ribbon{display:inline-flex;align-items:center;gap:6px;margin-top:12px;position:relative;padding:6px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.vr-need{background:rgba(90,138,106,.2);color:var(--sage2);border:1px solid rgba(122,184,138,.3);}
+.vr-want{background:rgba(245,166,35,.15);color:var(--saffron2);border:1px solid rgba(232,135,10,.3);}
+.vr-luxury{background:rgba(192,82,74,.15);color:var(--rose2);border:1px solid rgba(192,82,74,.3);}
+
 /* SCORE TRIO */
 .strio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
-.stile{background:var(--parchment);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center;box-shadow:var(--sh);}
+.stile{background:var(--parchment);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center;box-shadow:var(--sh);transition:transform .2s;}
+.stile:hover{transform:translateY(-2px);}
 .stile .val{font-family:var(--font-d);font-size:1.8rem;font-weight:900;}
 .stile .lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:3px;}
 
 /* SCORE BARS */
-.sbar{margin-bottom:16px;}
-.sbar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-.sbar-name{font-size:12px;font-weight:500;}
+.sbar{margin-bottom:18px;}
+.sbar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.sbar-name{font-size:12px;font-weight:600;}
 .sbar-num{font-family:var(--font-d);font-size:13px;font-weight:700;color:var(--saffron);}
-.sbar-track{height:9px;background:var(--border);border-radius:5px;overflow:hidden;}
-.sbar-fill{height:100%;border-radius:5px;transition:width 1s cubic-bezier(.4,0,.2,1);width:0%;}
+.sbar-track{height:10px;background:var(--border);border-radius:5px;overflow:hidden;}
+.sbar-fill{height:100%;border-radius:5px;transition:width 1.2s cubic-bezier(.4,0,.2,1);width:0%;}
+.sbar-sub{font-size:10px;color:var(--muted);margin-top:4px;}
 
 /* RECS */
-.ritem{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border2);font-size:13px;line-height:1.5;}
+.ritem{display:flex;gap:10px;padding:13px 0;border-bottom:1px solid var(--border2);font-size:13px;line-height:1.5;}
 .ritem:last-child{border-bottom:none;}
-.ri{font-size:17px;flex-shrink:0;margin-top:1px;}
+.ri{font-size:18px;flex-shrink:0;margin-top:1px;}
 
 /* ALERTS */
 .alert{border-radius:var(--r);padding:12px 15px;font-size:12px;line-height:1.5;margin-bottom:12px;display:flex;gap:9px;align-items:flex-start;}
@@ -198,7 +235,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .alert-info{background:rgba(74,122,181,.07);border:1px solid rgba(74,122,181,.25);color:var(--sky);}
 
 /* LOCK BAR */
-.lock-bar{display:flex;align-items:center;gap:9px;font-size:12px;background:rgba(192,82,74,.06);border:1px solid rgba(192,82,74,.2);border-radius:var(--r);padding:11px 14px;margin-bottom:14px;color:var(--rose);}
+.lock-bar{display:flex;align-items:center;gap:9px;font-size:12px;border-radius:var(--r);padding:11px 14px;margin-bottom:14px;}
 
 /* AWARENESS */
 .aw-card{background:var(--ink);color:var(--parchment);border-radius:var(--rl);padding:22px;margin-bottom:16px;}
@@ -213,8 +250,9 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .chart-wrap{max-width:240px;margin:0 auto;}
 canvas#pie{width:100%!important;}
-.txitem{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border2);}
+.txitem{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border2);transition:background .15s;}
 .txitem:last-child{border-bottom:none;}
+.txitem:hover{background:rgba(232,135,10,.02);}
 .txdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 .txinfo{flex:1;}
 .txname{font-size:13px;font-weight:600;}
@@ -227,7 +265,8 @@ canvas#pie{width:100%!important;}
 .ldot{width:9px;height:9px;border-radius:50%;}
 
 /* HISTORY */
-.hitem{background:var(--parchment);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh);}
+.hitem{background:var(--parchment);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh);transition:transform .15s,box-shadow .15s;}
+.hitem:hover{transform:translateY(-1px);box-shadow:var(--sh2);}
 .hleft{display:flex;align-items:center;gap:12px;}
 .hicon{font-size:1.4rem;}
 .hname{font-family:var(--font-d);font-size:14px;font-weight:700;}
@@ -256,7 +295,11 @@ canvas#pie{width:100%!important;}
 .empty p{font-size:13px;line-height:1.5;}
 
 /* TOAST */
-.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--parchment);padding:11px 20px;border-radius:100px;font-size:13px;font-weight:600;z-index:99999;animation:fu .3s ease;white-space:nowrap;box-shadow:var(--sh2);}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--parchment);padding:11px 20px;border-radius:100px;font-size:13px;font-weight:600;z-index:99999;animation:fu .3s ease;white-space:nowrap;box-shadow:var(--sh2);border-left:3px solid var(--saffron);}
+
+/* SCORE REVEAL ANIMATION */
+@keyframes countUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.val-reveal{animation:countUp .5s ease both;}
 
 /* RESPONSIVE */
 @media(max-width:600px){
@@ -277,7 +320,7 @@ canvas#pie{width:100%!important;}
 <div class="masthead">
   <span class="kicker">✦ Student Financial Clarity Tool ✦</span>
   <h1>Smart<em>Buy</em></h1>
-  <p>Turn price tags into real work-time. Make purchases you'll never regret.</p>
+  <p>Turn price tags into real work-time. Weighted psychology scores + financial data = decisions you'll never regret.</p>
   <div class="dateline" id="dateline"></div>
 </div>
 <div class="deco-thin"></div>
@@ -316,6 +359,7 @@ canvas#pie{width:100%!important;}
         <div class="field"><label>Pocket Money / Month (₹)</label><input type="number" id="p-pocket" placeholder="5000" min="0"/><p class="fhint">Regular monthly allowance</p></div>
         <div class="field"><label>Part-time / Freelance (₹)</label><input type="number" id="p-part" placeholder="0" min="0"/></div>
       </div>
+      <div class="field"><label>Parent Contribution / Month (₹)</label><input type="number" id="p-parent" placeholder="0" min="0"/><p class="fhint">Amount parents give specifically for purchases or needs</p></div>
       <div class="field"><label>Current Savings Balance (₹)</label><input type="number" id="p-save" placeholder="8000" min="0"/></div>
       <div class="srule">Monthly Essential Expenses</div>
       <div class="frow">
@@ -387,6 +431,10 @@ canvas#pie{width:100%!important;}
 
   <!-- S3: QUESTIONS -->
   <div class="screen" id="scr-q">
+    <div id="impulse-alert" class="impulse-alert">
+      <span style="font-size:18px;flex-shrink:0">⚠️</span>
+      <span><strong>Impulse Alert:</strong> Your responses on style/trend questions are high. This may be an emotionally-driven purchase. Try to answer the remaining questions extra honestly.</span>
+    </div>
     <div id="q-container"></div>
     <div class="brow">
       <button class="btn btn-ink" onclick="gotoAw()">Calculate Work-Time →</button>
@@ -410,13 +458,13 @@ canvas#pie{width:100%!important;}
       <h4>⏳ The 24-Hour Buying Rule</h4>
       <p>Behavioural finance: waiting 24 hours before any non-essential purchase eliminates ~60% of impulse buys.</p>
       <div class="rtimer" id="rtimer">24:00:00</div>
-      <p style="font-size:11px;color:var(--muted)">If the timer ends and you still want it — it's likely a genuine want, not an impulse.</p>
+      <p style="font-size:11px;color:var(--muted)">If the timer ends and you still want it — it's likely genuine desire, not impulse.</p>
       <button class="btn btn-out" style="margin-top:9px;font-size:12px;padding:8px 14px" onclick="startTimer()">▶ Start 24-hr Timer</button>
     </div>
     <div class="aw-card">
       <h3>Awareness Check ★</h3>
       <p>Now that you see the real time-cost — how justified does this purchase actually feel?</p>
-      <div style="font-size:13px;color:rgba(245,239,230,.8);margin-bottom:12px;line-height:1.5">Knowing it costs <strong id="aw-remind" style="color:var(--saffron2)">X days</strong> of your free money — how justified does spending it feel?</div>
+      <div style="font-size:13px;color:rgba(245,239,230,.8);margin-bottom:12px;line-height:1.5">Knowing it costs <strong id="aw-remind" style="color:var(--saffron2)">X days</strong> of your free money — how justified does spending feel?</div>
       <div class="srow">
         <input type="range" min="0" max="10" value="5" id="aw-slider" oninput="document.getElementById('aw-v').textContent=this.value">
         <div class="snum" id="aw-v">5</div>
@@ -434,11 +482,12 @@ canvas#pie{width:100%!important;}
     <div class="res-hero">
       <span class="res-emoji" id="res-e">🤔</span>
       <div class="res-cat" id="res-c">—</div>
+      <div id="res-ribbon"></div>
       <div class="res-item" id="res-i">—</div>
       <div class="res-text" id="res-t">—</div>
     </div>
     <div class="strio">
-      <div class="stile"><div class="val" id="sc-ps" style="color:var(--sky)">—</div><div class="lbl">Psych Score</div></div>
+      <div class="stile"><div class="val" id="sc-ps" style="color:var(--sky)">—</div><div class="lbl">Weighted Need</div></div>
       <div class="stile"><div class="val" id="sc-d" style="color:var(--saffron)">—</div><div class="lbl">Days Cost</div></div>
       <div class="stile"><div class="val" id="sc-f" style="color:var(--sage)">—</div><div class="lbl">Final Score</div></div>
     </div>
@@ -463,7 +512,7 @@ canvas#pie{width:100%!important;}
     <span class="card-kicker">Monthly Overview</span>
     <div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr">
       <div class="stat-box"><div class="stat-v" id="tr-tot" style="color:var(--rose)">₹0</div><div class="stat-l">Total Spent</div></div>
-      <div class="stat-box"><div class="stat-v" id="tr-rem" style="color:var(--sage)">₹—</div><div class="stat-l">Budget Left</div></div>
+      <div class="stat-box"><div class="stat-v" id="tr-inc" style="color:var(--sage)">₹—</div><div class="stat-l">Monthly Income</div></div>
       <div class="stat-box"><div class="stat-v" id="tr-cnt">0</div><div class="stat-l">Transactions</div></div>
     </div>
   </div>
@@ -547,43 +596,152 @@ const PRODS=[
   {id:'other',name:'Other',icon:'📦'},
 ];
 
-// ── IMPROVED QUESTIONS (from C-program spec) ─────────────────
-const QG=[
-  {t:"Necessity",        q:"How much would your daily life or studies be affected if you did NOT buy this?",reverse:false},
-  {t:"Substitute",       q:"Do you already own something serving the same purpose? (0=perfect substitute exists, 10=nothing can replace it)",reverse:false},
-  {t:"Urgency",          q:"How urgently do you need this right now?",reverse:false},
-  {t:"Usage Duration",   q:"How likely are you to use this regularly for the next 6+ months?",reverse:false},
-  {t:"Emotional Drive",  q:"How much is this driven by emotion, impulse, or current mood?",reverse:true},
-  {t:"Social Influence", q:"How much is this influenced by others owning it or social trends?",reverse:true},
-  {t:"Financial Comfort",q:"How easily can you afford this WITHOUT affecting savings or essential expenses?",reverse:false},
-  {t:"Replacement Need", q:"Is this replacing something broken, unusable, or lost?",reverse:false},
-  {t:"Opportunity Cost", q:"How confident that spending here will NOT cause regret over the next month?",reverse:false},
-  {t:"Delayed Desire",   q:"If you waited ONE WEEK, how likely would you still want it equally?",reverse:false},
-];
-const QOVER={
+// ── FULLY UNIQUE QUESTION SETS PER PRODUCT (10 questions each) ─
+// w = weight. Negative w = impulse check (scores against purchase). reverse handled silently.
+const QBANK={
   laptop:[
-    {t:"Academic Necessity",q:"How essential is a laptop for your daily coursework and studies?"},
-    {t:"Current Device State",q:"How poor is your current device performance for your academic needs?"},
-    {t:"Daily Usage",q:"How many hours daily would you realistically use this laptop?"},
-    {t:"Course Requirement",q:"Does your course or internship specifically require better hardware?"},
+    {t:"Academic Necessity",     q:"How essential is a laptop for your daily coursework, assignments, or projects?",             w:2.5, reverse:false},
+    {t:"Current Device Failure",  q:"How poorly does your current device perform for academic tasks (slow, crashing, old)?",      w:2.0, reverse:false},
+    {t:"Daily Hours of Use",      q:"How many hours per day will you realistically use this laptop for productive work?",         w:2.0, reverse:false},
+    {t:"Course Requirement",      q:"Does your specific course or internship formally require better hardware performance?",      w:2.5, reverse:false},
+    {t:"Emotional Excitement",    q:"How much of this decision is driven by excitement about a new device rather than need?",     w:-2.0,reverse:true},
+    {t:"Brand Pressure",          q:"Are you choosing this model mainly because peers or social media made it look desirable?",   w:-1.5,reverse:true},
+    {t:"Financial Comfort",       q:"How easily can you fund this without cutting food, transport, or essential expenses?",       w:1.5, reverse:false},
+    {t:"Durability & Longevity",  q:"Will this laptop serve your academic and professional needs for at least 3 years?",         w:2.0, reverse:false},
+    {t:"Opportunity Cost",        q:"How confident are you this is the best use of this money right now vs other needs?",        w:1.5, reverse:false},
+    {t:"Delayed Desire Test",     q:"If you had to wait one full month, how likely would you still want this exact laptop?",     w:1.5, reverse:false},
   ],
   smartphone:[
-    {t:"Phone Condition",q:"How poor is your current phone's condition (battery, storage, performance)?"},
-    {t:"Study Impact",q:"How much does your current phone limit your study or communication?"},
-    {t:"Feature Need",q:"Are the new features genuinely needed for your academic/work life?"},
-    {t:"Longevity",q:"Will this phone realistically last you 3+ years?"},
+    {t:"Phone Condition",         q:"How broken, slow, or unusable is your current phone for daily communication and study?",    w:2.5, reverse:false},
+    {t:"Study & Work Impact",     q:"How much does your current phone genuinely limit your academic or professional output?",     w:2.0, reverse:false},
+    {t:"Feature Necessity",       q:"Are the new features (camera, chip, display) actually required for your coursework or job?",w:1.5, reverse:false},
+    {t:"Longevity Expectation",   q:"Will this phone realistically serve you well for 3 or more years?",                        w:2.0, reverse:false},
+    {t:"Upgrade Impulse",         q:"Are you upgrading mainly because a new model launched and the old one still works fine?",   w:-2.0,reverse:true},
+    {t:"Social Status Drive",     q:"How much does owning this specific brand/model matter for social image or peer approval?",  w:-1.5,reverse:true},
+    {t:"Financial Readiness",     q:"How comfortably does this purchase fit into your current financial situation?",             w:1.5, reverse:false},
+    {t:"Repair Alternative",      q:"How thoroughly have you explored repair, battery replacement, or refurbished options?",     w:1.5, reverse:false},
+    {t:"Opportunity Cost",        q:"Spending this amount — how sure are you it won't cause regret in the next 2 months?",      w:1.5, reverse:false},
+    {t:"Wait Resilience",         q:"Could you manage comfortably with your current phone for 2 more months if needed?",        w:1.5, reverse:false},
   ],
   headphones:[
-    {t:"Study Use",q:"How often would you use these for studying, calls, or online classes?"},
-    {t:"Current Audio",q:"How inadequate is your current audio setup?"},
-    {t:"Focus Need",q:"Do you genuinely need noise cancellation to focus better in your environment?"},
-    {t:"Purpose",q:"Is this primarily for studying vs. entertainment?"},
+    {t:"Study & Focus Need",      q:"How often will you use these specifically for studying, online classes, or focus work?",    w:2.5, reverse:false},
+    {t:"Current Audio Problem",   q:"How inadequate is your current audio setup for lectures, calls, or daily needs?",          w:2.0, reverse:false},
+    {t:"Noise Cancellation Need", q:"Is noise cancellation genuinely required due to your noisy study environment?",            w:1.5, reverse:false},
+    {t:"Usage Frequency",         q:"How many hours per day will you realistically use these headphones productively?",         w:2.0, reverse:false},
+    {t:"Trend/Hype Factor",       q:"Are you buying this mainly because it's trending or seen on influencers and friends?",     w:-2.0,reverse:true},
+    {t:"Spec Obsession",          q:"Are you choosing premium specs (Hi-Res, LDAC, ANC) you won't realistically notice?",      w:-1.5,reverse:true},
+    {t:"Financial Comfort",       q:"Can you afford this without touching your food, transport, or savings budget?",            w:1.5, reverse:false},
+    {t:"Alternative Check",       q:"How well do your current earphones or speakers fail for your actual use case?",            w:1.5, reverse:false},
+    {t:"Durability & Care",       q:"Are you confident you will maintain and use these carefully for 2+ years?",               w:1.5, reverse:false},
+    {t:"Delayed Desire Test",     q:"If you waited one week with no research — would you still want these equally?",            w:1.5, reverse:false},
+  ],
+  keyboard:[
+    {t:"Daily Typing Volume",     q:"How heavily do you type daily for assignments, code, reports, or notes?",                  w:2.0, reverse:false},
+    {t:"Ergonomic Pain",          q:"Do you experience actual wrist, finger, or hand strain with your current keyboard?",       w:2.0, reverse:false},
+    {t:"Productivity Impact",     q:"Will this keyboard measurably improve your speed, accuracy, or comfort for work?",         w:2.0, reverse:false},
+    {t:"Current Keyboard State",  q:"How broken, sticky, or genuinely unusable is your current keyboard?",                     w:2.0, reverse:false},
+    {t:"RGB / Aesthetic Drive",   q:"Are you buying mainly for RGB lighting, aesthetics, or the satisfying click sound?",      w:-2.0,reverse:true},
+    {t:"Peer Influence",          q:"Is this influenced by gaming communities, YouTube reviews, or peer ownership?",            w:-1.5,reverse:true},
+    {t:"Financial Comfort",       q:"Does this fit your budget without affecting any essential monthly expenses?",              w:1.5, reverse:false},
+    {t:"Longevity",               q:"Will this keyboard serve you productively for at least 2 years?",                         w:1.5, reverse:false},
+    {t:"Opportunity Cost",        q:"Is this the most impactful way to spend this amount for your studies or work?",           w:1.5, reverse:false},
+    {t:"Delayed Desire",          q:"If you couldn't buy this for two more weeks, would your urgency remain this high?",       w:1.5, reverse:false},
+  ],
+  mouse:[
+    {t:"Daily Work Use",          q:"How heavily do you use a mouse for daily study, design, coding, or professional work?",    w:2.0, reverse:false},
+    {t:"Current Hardware Problem",q:"Does your current mouse have real tracking errors, broken buttons, or hardware issues?",   w:2.0, reverse:false},
+    {t:"Efficiency Gain",         q:"Will this mouse genuinely improve your precision, speed, or reduce fatigue meaningfully?", w:1.5, reverse:false},
+    {t:"Work Requirement",        q:"Does your course or work (design, CAD, editing) specifically require a better mouse?",    w:2.0, reverse:false},
+    {t:"Gaming Status Drive",     q:"Are you buying mainly for gaming brand prestige, RGB, or competitive aesthetics?",         w:-1.5,reverse:true},
+    {t:"Impulse Purchase",        q:"Did you decide to buy this after watching a review or seeing a deal — not from actual need?",w:-2.0,reverse:true},
+    {t:"Financial Comfort",       q:"Can you buy this without any impact on food, transport, or essential expenses?",          w:1.5, reverse:false},
+    {t:"Durability",              q:"Is this a well-built mouse that will last you at least 2 years of daily use?",             w:1.5, reverse:false},
+    {t:"Alternative Check",       q:"How inadequate is your current mouse or trackpad for what you actually need to do?",      w:1.5, reverse:false},
+    {t:"Delayed Desire",          q:"If the deal expired today, would you still actively hunt for this same mouse tomorrow?",  w:1.5, reverse:false},
+  ],
+  tablet:[
+    {t:"Study Utility",           q:"How useful will this tablet be for taking notes, reading PDFs, or attending classes?",     w:2.0, reverse:false},
+    {t:"Course Requirement",      q:"Is a tablet specifically required or strongly recommended for your course or field?",      w:2.5, reverse:false},
+    {t:"Device Redundancy",       q:"Can your current laptop or phone already perform all these tasks reasonably well?",        w:-2.0,reverse:true},
+    {t:"Longevity of Use",        q:"Will you use this meaningfully every week for at least 2–3 years?",                       w:2.0, reverse:false},
+    {t:"Content Consumption Drive",q:"Are you buying primarily for YouTube, OTT, or casual entertainment rather than study?",  w:-1.5,reverse:true},
+    {t:"Apple/Brand Prestige",    q:"How much of the decision is about owning a premium brand over a functional need?",        w:-1.5,reverse:true},
+    {t:"Financial Comfort",       q:"Can you fund this fully without borrowing or cutting essential spending?",                 w:1.5, reverse:false},
+    {t:"Portability Need",        q:"Does your daily routine genuinely require a device more portable than your laptop?",      w:2.0, reverse:false},
+    {t:"Productivity Proof",      q:"Can you name 5 specific academic tasks this tablet will help with that your laptop cannot?",w:1.5, reverse:false},
+    {t:"Delayed Desire",          q:"After one week without researching tablets — would your desire to buy remain equally strong?",w:1.5,reverse:false},
+  ],
+  smartwatch:[
+    {t:"Daily Utility",           q:"How many practical daily tasks will this watch genuinely help you accomplish?",            w:1.5, reverse:false},
+    {t:"Health Tracking Use",     q:"Will you actively and consistently use fitness, heart rate, or sleep tracking features?",  w:2.0, reverse:false},
+    {t:"Phone Redundancy",        q:"Does this watch do something your phone genuinely cannot do in your daily routine?",      w:1.5, reverse:false},
+    {t:"Academic/Work Benefit",   q:"Does your course, internship, or health situation specifically benefit from a smartwatch?",w:1.5, reverse:false},
+    {t:"Social Status Drive",     q:"Are you buying this mainly to match peers, look professional, or for social validation?",  w:-2.0,reverse:true},
+    {t:"Notification Addiction",  q:"Is the main appeal getting notifications on your wrist rather than genuine utility?",     w:-1.5,reverse:true},
+    {t:"Financial Comfort",       q:"Does this purchase fit your finances without affecting savings or essential costs?",       w:1.5, reverse:false},
+    {t:"Battery & Upkeep",        q:"Are you realistically prepared for daily/frequent charging and software maintenance?",    w:1.5, reverse:false},
+    {t:"Opportunity Cost",        q:"Is a smartwatch the most impactful way to spend this money for your wellbeing right now?",w:1.5, reverse:false},
+    {t:"Delayed Desire",          q:"If you removed all watch-related content from your feed for a week — would you still want it?",w:1.5,reverse:false},
   ],
   console:[
-    {t:"Entertainment Value",q:"How significantly would this improve your stress-relief and downtime?"},
-    {t:"Study Risk",q:"How likely is this to negatively affect your studies or sleep schedule?"},
-    {t:"Alternatives",q:"Do you already own other gaming devices (PC, phone, older console)?"},
-    {t:"Time Control",q:"How confident are you in controlling your gaming time?"},
+    {t:"Stress Relief Value",     q:"How significantly would gaming help your mental health, stress relief, and wellbeing?",    w:1.5, reverse:false},
+    {t:"Time Management Confidence",q:"How confident are you that gaming won't negatively affect your study hours or sleep?",  w:1.5, reverse:false},
+    {t:"Existing Device Check",   q:"Do you already own a gaming PC, older console, or phone that covers most gaming needs?",  w:-1.5,reverse:true},
+    {t:"Study Risk",              q:"How likely is this console to seriously interfere with your academic performance?",        w:-2.0,reverse:true},
+    {t:"Peer/FOMO Influence",     q:"Are you buying mainly because friends have it or because of trending games and hype?",    w:-1.5,reverse:true},
+    {t:"Financial Comfort",       q:"Can you afford the console plus games without affecting any essential monthly costs?",    w:1.5, reverse:false},
+    {t:"Content Exclusivity",     q:"Are there exclusive games on this console that genuinely matter to you and aren't elsewhere?",w:1.5,reverse:false},
+    {t:"Usage Frequency",         q:"How realistically will you play this at least 3–4 times per week for the next 6 months?", w:2.0, reverse:false},
+    {t:"Opportunity Cost",        q:"Could this money better serve your education, health, or a genuine financial need now?",  w:1.5, reverse:false},
+    {t:"Delayed Desire",          q:"If you waited 2 months and saved for it — would you still feel equally motivated to buy?",w:1.5, reverse:false},
+  ],
+  bicycle:[
+    {t:"Commute Necessity",       q:"How necessary is this bicycle for your daily travel to college, work, or essential places?",w:2.5,reverse:false},
+    {t:"Daily Usage",             q:"How many days per week will you realistically ride this bicycle for commuting or exercise?",w:2.0,reverse:false},
+    {t:"Cost Savings",            q:"Will this bicycle save you meaningful money on transport every month?",                    w:2.0, reverse:false},
+    {t:"Health & Fitness",        q:"Will you genuinely use this for regular exercise beyond just commuting?",                 w:1.5, reverse:false},
+    {t:"Cheap Alternative",       q:"Are there cheap, safe, and convenient public transport options already available to you?", w:-1.5,reverse:true},
+    {t:"Aesthetic Upgrade",       q:"Are you choosing a premium model mainly for aesthetics or brand — not for durability?",   w:-1.5,reverse:true},
+    {t:"Financial Comfort",       q:"Can you fund this without affecting essential monthly expenses or savings?",               w:1.5, reverse:false},
+    {t:"Safety & Practicality",   q:"Is it safe and practical to regularly ride a bicycle in your area (road, weather, storage)?",w:1.5,reverse:false},
+    {t:"Maintenance Readiness",   q:"Are you prepared for punctures, maintenance, and storage responsibilities?",              w:1.5, reverse:false},
+    {t:"Delayed Desire",          q:"If you had to wait one more month — would your need for this bicycle remain equally strong?",w:1.5,reverse:false},
+  ],
+  backpack:[
+    {t:"Daily Necessity",         q:"How necessary is a new backpack for your daily college or work routine?",                 w:2.0, reverse:false},
+    {t:"Current Bag Condition",   q:"How broken, torn, uncomfortable, or genuinely unusable is your current bag?",            w:2.0, reverse:false},
+    {t:"Carry Requirements",      q:"Does your daily load (laptop, books, equipment) genuinely require a better bag?",        w:2.0, reverse:false},
+    {t:"Durability Investment",   q:"Will this backpack genuinely last and improve your daily experience for 2+ years?",      w:2.0, reverse:false},
+    {t:"Brand & Aesthetic Drive", q:"Are you buying mainly for the brand name, logo, or social image?",                       w:-1.5,reverse:true},
+    {t:"Impulse from Review",     q:"Did you decide to buy this after seeing a review, influencer, or flash sale — not from need?",w:-1.5,reverse:true},
+    {t:"Financial Comfort",       q:"Does this fit your budget without affecting transport, food, or essential monthly costs?",w:1.5, reverse:false},
+    {t:"Feature Necessity",       q:"Do you specifically need features like laptop compartment, water resistance, or anti-theft?",w:1.5,reverse:false},
+    {t:"Opportunity Cost",        q:"Is a new backpack the most impactful use of this money in your current situation?",      w:1.5, reverse:false},
+    {t:"Delayed Desire",          q:"If you couldn't buy a bag for 2 weeks — would your urgency for this remain the same?",   w:1.5, reverse:false},
+  ],
+  camera:[
+    {t:"Professional/Course Need",q:"How essential is a camera for your course, internship, freelance, or creative career?",  w:2.5, reverse:false},
+    {t:"Phone Camera Limitation", q:"How genuinely insufficient is your phone camera for the work you actually need to do?",   w:2.0, reverse:false},
+    {t:"Usage Frequency",         q:"How often will you take this camera out and use it — at least 3 times per week?",        w:2.0, reverse:false},
+    {t:"Skill Level Match",       q:"Do you have the skills and time to genuinely use this camera's capabilities?",           w:1.5, reverse:false},
+    {t:"Social Media Aesthetic",  q:"Are you buying primarily for Instagram/YouTube aesthetics rather than functional work?",  w:-1.5,reverse:true},
+    {t:"Gear Obsession",          q:"Is this driven more by gear excitement (specs, lens, brand) than your actual output need?",w:-2.0,reverse:true},
+    {t:"Financial Comfort",       q:"Can you fund the camera plus accessories without affecting essential expenses?",          w:1.5, reverse:false},
+    {t:"Income Potential",        q:"Will this camera realistically help you earn money or advance your career within a year?",w:2.0, reverse:false},
+    {t:"Opportunity Cost",        q:"Is there a more impactful investment in your skill or education at this price?",         w:1.5, reverse:false},
+    {t:"Delayed Desire",          q:"If you waited one month and did paid shoots with a rented camera — would you still buy?", w:1.5, reverse:false},
+  ],
+  other:[
+    {t:"Genuine Necessity",       q:"How much would your daily life or studies be affected if you did NOT buy this?",         w:2.5, reverse:false},
+    {t:"No Substitute Exists",    q:"Do you already own something that serves the same purpose adequately?",                  w:2.0, reverse:false},
+    {t:"Urgency",                 q:"How urgently do you need this right now versus being able to wait a month?",             w:1.5, reverse:false},
+    {t:"Long-term Usage",         q:"How likely are you to use this regularly every week for the next 6+ months?",           w:2.0, reverse:false},
+    {t:"Emotional Drive",         q:"How much of this decision is driven by emotion, impulse, or your current mood?",        w:-2.0,reverse:true},
+    {t:"Social Influence",        q:"How much is this influenced by others owning it or current social trends?",              w:-1.5,reverse:true},
+    {t:"Financial Comfort",       q:"How easily can you afford this without affecting savings or essential expenses?",        w:1.5, reverse:false},
+    {t:"Replacement Need",        q:"Is this replacing something broken, unusable, worn out, or genuinely lost?",            w:2.0, reverse:false},
+    {t:"Opportunity Cost",        q:"How confident are you spending here won't cause regret over the next month?",           w:1.5, reverse:false},
+    {t:"Delayed Desire",          q:"If you waited one full week — how likely would you still want this equally?",           w:1.5, reverse:false},
   ],
 };
 
@@ -592,10 +750,11 @@ const CCLR={food:'#e8870a',transport:'#4a7ab5',study:'#5a8a6a',tech:'#8b5cf6',en
 const CICO={food:'🍚',transport:'🚌',study:'📚',tech:'💻',entertainment:'🎮',clothing:'👕',health:'💊',other:'📦'};
 
 // ── STATE ─────────────────────────────────────────────────────
-let profile=JSON.parse(localStorage.getItem('sb_p')||'null');
-let history=JSON.parse(localStorage.getItem('sb_h')||'[]');
-let txs=JSON.parse(localStorage.getItem('sb_tx')||'[]');
-let ph=JSON.parse(localStorage.getItem('sb_ph')||'{}');
+let profile=null,history=[],txs=[],ph={};
+try{profile=JSON.parse(localStorage.getItem('sb_p')||'null');}catch(e){}
+try{history=JSON.parse(localStorage.getItem('sb_h')||'[]');}catch(e){history=[];}
+try{txs=JSON.parse(localStorage.getItem('sb_tx')||'[]');}catch(e){txs=[];}
+try{ph=JSON.parse(localStorage.getItem('sb_ph')||'{}');}catch(e){ph={};}
 let selProd=null,itemPrice=0,slVals=Array(10).fill(5),awVal=5,lastRes=null,monthSpent=0,tmrInt=null;
 
 // ── INIT ──────────────────────────────────────────────────────
@@ -604,11 +763,8 @@ window.onload=()=>{
   const qr=QUOTES[Math.floor(Math.random()*QUOTES.length)];
   document.getElementById('qt').textContent=qr.q;
   document.getElementById('qa').textContent='— '+qr.a;
-  buildGrid();
-  calcMonthSpent();
-  renderTx();
+  buildGrid();calcMonthSpent();renderTx();
   if(profile){gotoS('scr-product');setP(2,5);checkLock();}
-  // resume timer
   const tend=+localStorage.getItem('sb_tend')||0;
   if(tend>Date.now()){tickTimer();tmrInt=setInterval(tickTimer,1000);}
 };
@@ -635,13 +791,14 @@ function saveProfile(){
   const name=document.getElementById('p-name').value.trim()||'Student';
   const pocket=+document.getElementById('p-pocket').value||0;
   const part=+document.getElementById('p-part').value||0;
+  const parent=+document.getElementById('p-parent').value||0;
   const save=+document.getElementById('p-save').value||0;
   const food=+document.getElementById('p-food').value||0;
   const trans=+document.getElementById('p-trans').value||0;
   const study=+document.getElementById('p-study').value||0;
   const other=+document.getElementById('p-other').value||0;
   const budget=+document.getElementById('p-budget').value||0;
-  const inc=pocket+part,exp=food+trans+study+other,free=inc-exp,daily=free/30;
+  const inc=pocket+part+parent,exp=food+trans+study+other,free=inc-exp,daily=free/30;
   document.getElementById('si').textContent='₹'+f(inc);
   document.getElementById('se').textContent='₹'+f(exp);
   document.getElementById('sf').textContent='₹'+f(free);
@@ -651,8 +808,8 @@ function saveProfile(){
   if(free<=0){al.className='alert alert-bad';al.innerHTML='⚠️ Expenses exceed income. Any purchase needs very careful consideration.';}
   else if(free<1000){al.className='alert alert-warn';al.innerHTML='⚠️ Very limited free cash. Prioritise carefully.';}
   else{al.className='alert alert-good';al.innerHTML=`✅ You have ₹${f(free)} free/month (₹${f(Math.round(daily))}/day).`;}
-  profile={name,pocket,part,save,food,trans,study,other,budget,totalIncome:inc,totalExpense:exp,freeMonthly:free,freeDaily:daily};
-  localStorage.setItem('sb_p',JSON.stringify(profile));
+  profile={name,pocket,part,parent,save,food,trans,study,other,budget,totalIncome:inc,totalExpense:exp,freeMonthly:free,freeDaily:daily};
+  try{localStorage.setItem('sb_p',JSON.stringify(profile));}catch(e){}
   setP(2,5);checkLock();gotoS('scr-product');
 }
 
@@ -663,11 +820,19 @@ function checkLock(){
   const msg=document.getElementById('lock-msg');
   if(!profile.budget||profile.budget<=0){bar.style.display='none';return;}
   bar.style.display='flex';
-  if(monthSpent>=profile.budget){bar.style.background='rgba(192,82,74,.07)';bar.style.borderColor='rgba(192,82,74,.2)';bar.style.color='var(--rose)';msg.textContent=`🔒 Budget limit reached: ₹${f(monthSpent)} spent of ₹${f(profile.budget)} this month.`;}
-  else{bar.style.background='rgba(90,138,106,.06)';bar.style.borderColor='rgba(90,138,106,.2)';bar.style.color='var(--sage)';msg.textContent=`✅ Budget: ₹${f(monthSpent)} of ₹${f(profile.budget)} spent. ₹${f(profile.budget-monthSpent)} remaining.`;}
+  if(monthSpent>=profile.budget){
+    bar.className='lock-bar alert alert-bad';
+    msg.textContent=`🔒 Budget limit reached: ₹${f(monthSpent)} spent of ₹${f(profile.budget)} this month.`;
+  }else{
+    bar.className='lock-bar alert alert-good';
+    msg.textContent=`✅ Budget: ₹${f(monthSpent)} of ₹${f(profile.budget)} spent. ₹${f(profile.budget-monthSpent)} remaining.`;
+  }
 }
 
-function calcMonthSpent(){const m=new Date().getMonth(),y=new Date().getFullYear();monthSpent=txs.filter(t=>{const d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y;}).reduce((s,t)=>s+t.amount,0);}
+function calcMonthSpent(){
+  const m=new Date().getMonth(),y=new Date().getFullYear();
+  monthSpent=txs.filter(t=>{const d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y;}).reduce((s,t)=>s+t.amount,0);
+}
 
 // ── PRODUCT GRID ──────────────────────────────────────────────
 function buildGrid(){
@@ -685,9 +850,8 @@ function parseURL(){
   else if(url.includes('amazon.in')||url.includes('amazon.com'))plat='Amazon';
   else if(url.includes('meesho.com'))plat='Meesho';
   else if(url.includes('croma.com'))plat='Croma';
-  hint.innerHTML=`✅ Detected: <strong>${plat}</strong>. Prices can't be scraped in browser — use Compare section below to check all platforms.`;
+  hint.innerHTML=`✅ Detected: <strong>${plat}</strong>. Prices can't be scraped in browser — use Compare section below.`;
   hint.style.color='var(--sage)';
-  // Auto-select category
   const ul=url.toLowerCase();
   for(const p of PRODS){if(ul.includes(p.id)||ul.includes(p.name.toLowerCase())){selProd2(p.id);break;}}
 }
@@ -724,11 +888,11 @@ function logPrice(){
   if(!ph[selProd])ph[selProd]=[];
   ph[selProd].unshift({price,src,date:new Date().toLocaleDateString('en-IN')});
   if(ph[selProd].length>10)ph[selProd].pop();
-  localStorage.setItem('sb_ph',JSON.stringify(ph));
+  try{localStorage.setItem('sb_ph',JSON.stringify(ph));}catch(e){}
   document.getElementById('ph-price').value='';document.getElementById('ph-src').value='';
   renderPH(selProd);toast('Price logged!');
 }
-function delPH(pid,i){ph[pid].splice(i,1);localStorage.setItem('sb_ph',JSON.stringify(ph));renderPH(pid);}
+function delPH(pid,i){ph[pid].splice(i,1);try{localStorage.setItem('sb_ph',JSON.stringify(ph));}catch(e){}renderPH(pid);}
 
 // ── GOTO QUESTIONS ────────────────────────────────────────────
 function gotoQ(){
@@ -736,34 +900,47 @@ function gotoQ(){
   const price=+document.getElementById('item-price').value;
   if(!price||price<=0){toast('Enter the item price');return;}
   itemPrice=price;slVals=Array(10).fill(5);
-  const ov=QOVER[selProd]||[];
-  const qs=QG.map((gq,i)=>ov[i]?{t:ov[i].t,q:ov[i].q,reverse:gq.reverse}:gq);
+  const qs=QBANK[selProd]||QBANK['other'];
   const prod=PRODS.find(p=>p.id===selProd);
+
   document.getElementById('q-container').innerHTML=`
     <div class="card" style="margin-bottom:14px">
       <span class="card-kicker">Step 3 — Psychological Evaluation</span>
       <div style="display:flex;align-items:center;gap:12px">
         <span style="font-size:2rem">${prod.icon}</span>
-        <div><div class="card-h">${prod.name}</div><div style="color:var(--muted);font-size:12px">Rate each 0–10 honestly. No one else sees this.</div></div>
+        <div><div class="card-h">${prod.name}</div><div style="color:var(--muted);font-size:12px">Rate honestly 0–10. No one else sees this.</div></div>
       </div>
     </div>
-    ${qs.map((q,i)=>`
-      <div class="qblock">
+    ${qs.map((q,i)=>{
+      const isNeg=q.w<0;
+      return `
+      <div class="qblock${isNeg?' q-negative':''}">
         <div class="qtop">
           <div class="qnum">${i+1}</div>
-          <div>
+          <div style="flex:1">
             <div class="qtitle">${q.t}</div>
             <div class="qdesc">${q.q}</div>
-            ${q.reverse?'<span class="qrev">⚠ REVERSE — higher = more concern</span>':''}
           </div>
         </div>
         <div class="srow">
-          <input type="range" min="0" max="10" value="5" id="qs${i}" oninput="slVals[${i}]=+this.value;document.getElementById('sv${i}').textContent=this.value">
+          <input type="range" min="0" max="10" value="5" id="qs${i}"
+            oninput="slVals[${i}]=+this.value;document.getElementById('sv${i}').textContent=this.value;checkImpulse()">
           <div class="snum" id="sv${i}">5</div>
         </div>
         <div class="sends"><span>0 — Not at all</span><span>5 — Neutral</span><span>10 — Absolutely</span></div>
-      </div>`).join('')}`;
+      </div>`}).join('')}`;
+
+  document.getElementById('impulse-alert').classList.remove('show');
   setP(3,5);gotoS('scr-q');
+}
+
+// ── LIVE IMPULSE DETECTION ────────────────────────────────────
+function checkImpulse(){
+  const qs=QBANK[selProd]||QBANK['other'];
+  let negTotal=0,negCount=0;
+  qs.forEach((q,i)=>{if(q.w<0){negTotal+=slVals[i];negCount++;}});
+  const avg=negCount>0?negTotal/negCount:0;
+  document.getElementById('impulse-alert').classList.toggle('show',avg>=6.5);
 }
 
 // ── GOTO AWARENESS ────────────────────────────────────────────
@@ -785,7 +962,7 @@ function gotoAw(){
 // ── 24-HR TIMER ───────────────────────────────────────────────
 function startTimer(){
   if(tmrInt){clearInterval(tmrInt);tmrInt=null;}
-  localStorage.setItem('sb_tend',(Date.now()+86400000).toString());
+  try{localStorage.setItem('sb_tend',(Date.now()+86400000).toString());}catch(e){}
   tickTimer();tmrInt=setInterval(tickTimer,1000);
   toast('24-hour timer started!');
 }
@@ -799,68 +976,110 @@ function tickTimer(){
   if(rem===0&&tmrInt){clearInterval(tmrInt);tmrInt=null;}
 }
 
-// ── CALCULATE RESULT ──────────────────────────────────────────
+// ── CALCULATE RESULT — WEIGHTED SCORING ───────────────────────
 function calcResult(){
   awVal=+document.getElementById('aw-slider').value;
-  const ov=QOVER[selProd]||[];
-  const qs=QG.map((gq,i)=>ov[i]?{t:ov[i].t,q:ov[i].q,reverse:gq.reverse}:gq);
-  let raw=0;qs.forEach((q,i)=>{const v=slVals[i];raw+=q.reverse?(10-v):v;});
-  const psy=(raw/100)*100;
+  const qs=QBANK[selProd]||QBANK['other'];
+
+  // Weighted score: slider_val * weight (negative questions already have negative w)
+  let weightedSum=0;
+  let maxPositive=0;
+  let minPossible=0;
+  qs.forEach((q,i)=>{
+    const val=slVals[i];
+    weightedSum+=val*q.w;
+    if(q.w>0)maxPositive+=10*q.w;
+    if(q.w<0)minPossible+=10*q.w; // negative contribution at max slider
+  });
+  // Normalize: min possible = minPossible, max possible = maxPositive
+  const range=maxPositive-minPossible;
+  const psy=range>0?((weightedSum-minPossible)/range)*100:50;
+
   const fd=profile.freeDaily;
   const days=fd>0?itemPrice/fd:999;
   const pen=Math.min(days*1.5,45);
   let final=Math.max(0,Math.min(100,psy-pen+(awVal*1.5)));
-  let cat,em,cls,verdict;
-  if(final>=65){cat='NEED';em='✅';cls='cat-need';verdict=`Based on your answers, this purchase has strong justification for ${profile.name}. The need is real and the cost-to-value ratio supports going ahead — provided it fits your budget.`;}
-  else if(final>=38){cat='WANT';em='🤔';cls='cat-want';verdict=`This is a Want, not a necessity right now. Your scores suggest genuine desire but limited urgency. Try the 24-hour rule. If you still feel the same tomorrow, budget for it deliberately.`;}
-  else{cat='LUXURY';em='🚫';cls='cat-luxury';verdict=`This reads as a Luxury — emotionally appealing but not essential. The time-cost is significant relative to your income. Strong recommendation: delay and save for this over 2–3 months.`;}
+
+  let cat,em,cls,ribbonCls,verdict;
+  if(final>=65){
+    cat='NEED';em='✅';cls='cat-need';ribbonCls='vr-need';
+    verdict=`Based on your weighted responses, this purchase has strong justification for ${profile.name}. The need is real and the cost-to-value ratio supports going ahead — provided it fits your budget.`;
+  }else if(final>=38){
+    cat='WANT';em='🤔';cls='cat-want';ribbonCls='vr-want';
+    verdict=`This is a Want, not a necessity right now. Your scores suggest genuine desire but limited urgency. Try the 24-hour rule. If you still feel the same tomorrow, budget for it deliberately.`;
+  }else{
+    cat='LUXURY';em='🚫';cls='cat-luxury';ribbonCls='vr-luxury';
+    verdict=`This reads as a Luxury — emotionally appealing but not financially or practically justified right now. Strong recommendation: delay and save for this over 2–3 months.`;
+  }
   if(profile.budget>0&&monthSpent>=profile.budget)verdict='🔒 BUDGET LOCKED: Monthly limit hit. '+verdict;
+
   const prod=PRODS.find(p=>p.id===selProd);
   document.getElementById('res-e').textContent=em;
   document.getElementById('res-c').innerHTML=`<span class="${cls}">${cat}</span>`;
+  document.getElementById('res-ribbon').innerHTML=`<span class="verdict-ribbon ${ribbonCls}">${cat === 'NEED'?'✅ Good to buy':'WANT'===cat?'⏳ Wait & consider':'🚫 Hold off'}</span>`;
   document.getElementById('res-i').textContent=`${prod.icon} ${prod.name} — ₹${f(itemPrice)}`;
   document.getElementById('res-t').textContent=verdict;
-  document.getElementById('sc-ps').textContent=Math.round(psy);
-  document.getElementById('sc-d').textContent=days.toFixed(1)+'d';
-  document.getElementById('sc-f').textContent=Math.round(final);
+
+  // Animate scores
+  setTimeout(()=>{
+    document.getElementById('sc-ps').textContent=Math.round(psy);
+    document.getElementById('sc-ps').classList.add('val-reveal');
+  },200);
+  setTimeout(()=>{
+    document.getElementById('sc-d').textContent=days.toFixed(1)+'d';
+    document.getElementById('sc-d').classList.add('val-reveal');
+  },350);
+  setTimeout(()=>{
+    document.getElementById('sc-f').textContent=Math.round(final);
+    document.getElementById('sc-f').classList.add('val-reveal');
+  },500);
+
   const bars=[
-    {n:'Psychological Need Score',v:psy,c:'var(--sky)'},
-    {n:'Time-Cost Penalty',v:Math.min(100,pen/45*100),c:'var(--rose)'},
-    {n:'Awareness & Justification',v:awVal*10,c:'#8b5cf6'},
-    {n:'Final Decision Score',v:final,c:final>=65?'var(--sage2)':final>=38?'var(--saffron2)':'var(--rose2)'},
+    {n:'Weighted Psychological Need',v:psy,c:'var(--sky)',s:'Higher = stronger genuine need for this item'},
+    {n:'Time-Cost Impact',v:Math.min(100,pen/45*100),c:'var(--rose)',s:`₹${f(itemPrice)} = ${days.toFixed(1)} days of free money`},
+    {n:'Awareness & Post-Cost Justification',v:awVal*10,c:'#8b5cf6',s:'Your gut feeling after seeing the real cost'},
+    {n:'Final Decision Score',v:final,c:final>=65?'var(--sage2)':final>=38?'var(--saffron2)':'var(--rose2)',s:final>=65?'Strong buy signal':'WANT'===cat?'Marginal — consider waiting':'Low — delay recommended'},
   ];
   document.getElementById('sbars').innerHTML=bars.map(b=>`
     <div class="sbar">
       <div class="sbar-top"><span class="sbar-name">${b.n}</span><span class="sbar-num">${Math.round(b.v)}/100</span></div>
       <div class="sbar-track"><div class="sbar-fill" style="background:${b.c}" data-t="${Math.min(100,b.v).toFixed(1)}"></div></div>
+      <div class="sbar-sub">${b.s}</div>
     </div>`).join('');
-  document.getElementById('recs').innerHTML=buildRecs(cat,days,psy,awVal).map(r=>`<div class="ritem"><span class="ri">${r.i}</span><span>${r.t}</span></div>`).join('');
+
+  document.getElementById('recs').innerHTML=buildRecs(cat,days,psy,awVal,final).map(r=>`<div class="ritem"><span class="ri">${r.i}</span><span>${r.t}</span></div>`).join('');
+
   lastRes={id:Date.now(),product:selProd,productName:prod.name,productIcon:prod.icon,price:itemPrice,category:cat,finalScore:Math.round(final),psychScore:Math.round(psy),workDays:days.toFixed(1),date:new Date().toLocaleDateString('en-IN')};
-  history.unshift(lastRes);if(history.length>50)history.pop();localStorage.setItem('sb_h',JSON.stringify(history));
+  history.unshift(lastRes);if(history.length>50)history.pop();
+  try{localStorage.setItem('sb_h',JSON.stringify(history));}catch(e){}
+
   setP(5,5);gotoS('scr-result');
-  setTimeout(()=>document.querySelectorAll('.sbar-fill').forEach(el=>el.style.width=el.dataset.t+'%'),300);
+  setTimeout(()=>document.querySelectorAll('.sbar-fill').forEach(el=>el.style.width=el.dataset.t+'%'),400);
 }
 
-function buildRecs(cat,days,psy,aw){
+// ── RECOMMENDATIONS ───────────────────────────────────────────
+function buildRecs(cat,days,psy,aw,final){
   const r=[];
   if(cat==='NEED'){
-    r.push({i:'✅',t:'Your need score justifies this. Go ahead with confidence.'});
-    if(days>15)r.push({i:'💰',t:'Look for student discounts, cashback, or 0% EMI offers to ease the payment.'});
-    r.push({i:'🔍',t:'Compare 2–3 platforms before buying. Price gap can be ₹500–₹2000.'});
-    if(aw<5)r.push({i:'⚡',t:'Your gut felt uncertain (low awareness). Sleep on it tonight before finalising.'});
+    r.push({i:'✅',t:'Your weighted need score justifies this. Go ahead with confidence.'});
+    if(days>15)r.push({i:'💰',t:'Look for student discounts, cashback, bank offers, or 0% EMI to ease the payment.'});
+    r.push({i:'🔍',t:'Compare 2–3 platforms before buying — the price gap can be ₹500–₹2000.'});
+    if(aw<5)r.push({i:'⚡',t:'Your gut felt uncertain even after seeing the cost. Sleep on it tonight before finalising.'});
+    r.push({i:'🛒',t:'Best time: Flipkart Big Billion Days, Amazon Great Indian Festival, or Republic Day sales.'});
   }else if(cat==='WANT'){
-    r.push({i:'⏳',t:'Start the 24-hour timer above. If you still want it tomorrow, it\'s real desire, not impulse.'});
-    r.push({i:'🎯',t:`Save ₹${f(Math.round(itemPrice/30))}/day for ${Math.ceil(days)} days to fund this without stress.`});
+    r.push({i:'⏳',t:"Start the 24-hour timer above. If you still want it tomorrow, it's real desire — not impulse."});
+    r.push({i:'🎯',t:`Save ₹${f(Math.round(itemPrice/Math.max(1,Math.ceil(days))))} per day for ${Math.ceil(days)} days to fund this without stress.`});
     r.push({i:'🔄',t:'Check if college library, hostel, or a friend has one to borrow temporarily.'});
-    if(days>20)r.push({i:'🛒',t:'Wait for Big Billion Day or Amazon Great Indian Festival — prices drop 20–40%.'});
+    if(days>20)r.push({i:'🛒',t:'Wait for a sale event — prices drop 20–40% during Big Billion / Great Indian Festival.'});
+    if(psy>60)r.push({i:'💡',t:'Your psychological need is actually fairly high — revisit after one week and re-evaluate.'});
   }else{
-    r.push({i:'🚫',t:'Delay this purchase. Both your financial and need scores recommend waiting.'});
-    r.push({i:'🏦',t:`Set a savings goal: ₹${f(Math.round(itemPrice/4))}/month for 4 months. Buy it debt-free.`});
-    r.push({i:'❓',t:'Ask again in 30 days. If you still feel the same and have saved enough — go for it.'});
+    r.push({i:'🚫',t:'Delay this purchase. Both your financial and weighted need scores recommend waiting.'});
+    r.push({i:'🏦',t:`Savings goal: ₹${f(Math.round(itemPrice/4))}/month for 4 months. Buy it debt-free and guilt-free.`});
+    r.push({i:'❓',t:'Ask again in 30 days. If you still feel the same and have saved — then go for it.'});
     r.push({i:'🤝',t:'Rent, borrow, or find a refurbished version at 40–60% of this price.'});
     if(profile.budget>0&&monthSpent>=profile.budget)r.push({i:'🔒',t:'Monthly budget limit reached. This purchase is blocked for this month.'});
   }
-  r.push({i:'📊',t:`This costs ${days.toFixed(1)} days of your free money = ${(days/30*100).toFixed(0)}% of your monthly discretionary budget.`});
+  r.push({i:'📊',t:`This costs ${days.toFixed(1)} days of free money = ${(days/30*100).toFixed(0)}% of your monthly discretionary budget.`});
   return r;
 }
 
@@ -868,7 +1087,7 @@ function buildRecs(cat,days,psy,aw){
 function logToTracker(){
   if(!lastRes)return;
   txs.unshift({id:Date.now(),name:lastRes.productName,amount:lastRes.price,category:'tech',date:new Date().toISOString()});
-  localStorage.setItem('sb_tx',JSON.stringify(txs));
+  try{localStorage.setItem('sb_tx',JSON.stringify(txs));}catch(e){}
   calcMonthSpent();toast('Added to Money Tracker!');tab('tracker');
 }
 
@@ -882,6 +1101,8 @@ function startNew(){
   document.getElementById('url-hint').style.color='';
   document.getElementById('plat-section').style.display='none';
   document.getElementById('ph-section').style.display='none';
+  document.getElementById('aw-slider').value=5;
+  document.getElementById('aw-v').textContent='5';
   checkLock();setP(2,5);gotoS('scr-product');tab('advisor');
 }
 
@@ -893,19 +1114,19 @@ function addTx(){
   if(!name){toast('Enter item name');return;}
   if(!amt){toast('Enter amount');return;}
   txs.unshift({id:Date.now(),name,amount:amt,category:cat,date:new Date().toISOString()});
-  localStorage.setItem('sb_tx',JSON.stringify(txs));
+  try{localStorage.setItem('sb_tx',JSON.stringify(txs));}catch(e){}
   document.getElementById('tx-name').value='';document.getElementById('tx-amt').value='';
   calcMonthSpent();renderTx();checkLock();toast('Expense added!');
 }
-function delTx(id){txs=txs.filter(t=>t.id!==id);localStorage.setItem('sb_tx',JSON.stringify(txs));calcMonthSpent();renderTx();}
-function clearTx(){if(!confirm('Clear all transactions?'))return;txs=[];localStorage.setItem('sb_tx',JSON.stringify(txs));calcMonthSpent();renderTx();}
+function delTx(id){txs=txs.filter(t=>t.id!==id);try{localStorage.setItem('sb_tx',JSON.stringify(txs));}catch(e){}calcMonthSpent();renderTx();}
+function clearTx(){if(!confirm('Clear all transactions?'))return;txs=[];try{localStorage.setItem('sb_tx',JSON.stringify(txs));}catch(e){}calcMonthSpent();renderTx();}
 
 function renderTx(){
   calcMonthSpent();
   const total=txs.reduce((s,t)=>s+t.amount,0);
   document.getElementById('tr-tot').textContent='₹'+f(total);
-  const br=profile&&profile.budget>0?Math.max(0,profile.budget-monthSpent):null;
-  document.getElementById('tr-rem').textContent=br!==null?'₹'+f(br):'₹—';
+  const inc=profile&&profile.totalIncome>0?profile.totalIncome:null;
+  document.getElementById('tr-inc').textContent=inc!==null?'₹'+f(inc):'₹—';
   document.getElementById('tr-cnt').textContent=txs.length;
   drawPie();
   const el=document.getElementById('tx-list');
@@ -926,9 +1147,17 @@ function drawPie(){
   ctx.clearRect(0,0,W,H);
   const tot={};txs.forEach(t=>{tot[t.category]=(tot[t.category]||0)+t.amount;});
   const ent=Object.entries(tot);const grand=ent.reduce((s,[,v])=>s+v,0);
-  if(!grand){ctx.fillStyle='#d8ccba';ctx.beginPath();ctx.arc(W/2,H/2,W/2-8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fdf8f1';ctx.font='13px Outfit,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('No data',W/2,H/2);document.getElementById('legend').innerHTML='';return;}
+  if(!grand){
+    ctx.fillStyle='#d8ccba';ctx.beginPath();ctx.arc(W/2,H/2,W/2-8,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fdf8f1';ctx.font='13px Outfit,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('No data',W/2,H/2);
+    document.getElementById('legend').innerHTML='';return;
+  }
   let ang=-Math.PI/2;const cx=W/2,cy=H/2,r=W/2-6;
-  ent.forEach(([cat,val])=>{const sl=val/grand*Math.PI*2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,ang,ang+sl);ctx.closePath();ctx.fillStyle=CCLR[cat]||'#888';ctx.fill();ctx.strokeStyle='#fdf8f1';ctx.lineWidth=2;ctx.stroke();ang+=sl;});
+  ent.forEach(([cat,val])=>{
+    const sl=val/grand*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,ang,ang+sl);ctx.closePath();
+    ctx.fillStyle=CCLR[cat]||'#888';ctx.fill();ctx.strokeStyle='#fdf8f1';ctx.lineWidth=2;ctx.stroke();ang+=sl;
+  });
   ctx.beginPath();ctx.arc(cx,cy,r*.48,0,Math.PI*2);ctx.fillStyle='#fdf8f1';ctx.fill();
   ctx.fillStyle='#1a1209';ctx.font=`bold 12px Outfit,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('₹'+f(grand),cx,cy-6);
   ctx.fillStyle='#8a7a62';ctx.font=`10px Outfit,sans-serif`;ctx.fillText('total',cx,cy+8);
@@ -941,7 +1170,12 @@ function renderHist(){
   if(!history.length){el.innerHTML='<div class="empty"><span class="ei">📋</span><h3>No evaluations yet</h3><p>Evaluate a purchase in the Advisor tab.</p></div>';return;}
   el.innerHTML=history.map(h=>`
     <div class="hitem">
-      <div class="hleft"><span class="hicon">${h.productIcon}</span><div><div class="hname">${h.productName} — ₹${f(h.price)}</div><div class="hmeta">${h.date} · Psych: ${h.psychScore} · Score: ${h.finalScore}/100 · ${h.workDays}d cost</div></div></div>
+      <div class="hleft"><span class="hicon">${h.productIcon}</span>
+        <div>
+          <div class="hname">${h.productName} — ₹${f(h.price)}</div>
+          <div class="hmeta">${h.date} · Weighted Score: ${h.finalScore}/100 · ${h.workDays}d cost</div>
+        </div>
+      </div>
       <span class="hbadge hb-${h.category.toLowerCase()}">${h.category}</span>
     </div>`).join('');
 }
@@ -950,15 +1184,16 @@ function renderHist(){
 function renderProf(){
   const el=document.getElementById('prof-view');
   if(!profile){el.innerHTML='<div class="empty"><span class="ei">👤</span><h3>No profile set</h3><p>Set up in the Advisor tab.</p></div>';return;}
+  calcMonthSpent();
   el.innerHTML=`
     <div class="card">
       <span class="card-kicker">Financial Profile</span>
       <div style="font-family:var(--font-d);font-size:2rem;font-weight:900;color:var(--ink);margin-bottom:16px">${profile.name}</div>
       <div class="stat-grid">
         <div class="stat-box"><div class="stat-v">₹${f(profile.totalIncome)}</div><div class="stat-l">Monthly Income</div></div>
+        <div class="stat-box"><div class="stat-v">₹${f(profile.parent||0)}</div><div class="stat-l">Parent Contribution</div></div>
         <div class="stat-box"><div class="stat-v">₹${f(profile.totalExpense)}</div><div class="stat-l">Monthly Expenses</div></div>
         <div class="stat-box"><div class="stat-v">₹${f(profile.freeMonthly)}</div><div class="stat-l">Free / Month</div></div>
-        <div class="stat-box"><div class="stat-v">₹${f(Math.round(profile.freeDaily))}</div><div class="stat-l">Free / Day</div></div>
       </div>
       ${profile.budget>0?`<div class="alert alert-info" style="margin-top:12px">🔒 Purchase budget: ₹${f(profile.budget)}/month. Spent this month: ₹${f(monthSpent)}.</div>`:''}
       <div class="brow" style="margin-top:16px">
@@ -968,17 +1203,26 @@ function renderProf(){
     </div>`;
 }
 function editProf(){
-  ['p-name','p-pocket','p-part','p-save','p-food','p-trans','p-study','p-other','p-budget'].forEach((id,i)=>{
-    const vals=[profile.name,profile.pocket,profile.part,profile.save,profile.food,profile.trans,profile.study,profile.other,profile.budget];
-    document.getElementById(id).value=vals[i]||'';
+  if(!profile)return;
+  ['p-name','p-pocket','p-part','p-parent','p-save','p-food','p-trans','p-study','p-other','p-budget'].forEach((id,i)=>{
+    const vals=[profile.name,profile.pocket,profile.part,profile.parent||0,profile.save,profile.food,profile.trans,profile.study,profile.other,profile.budget];
+    const el=document.getElementById(id);if(el)el.value=vals[i]||'';
   });
   gotoS('scr-profile');tab('advisor');setP(1,5);
 }
-function clearProf(){if(!confirm('Reset profile?'))return;profile=null;localStorage.removeItem('sb_p');renderProf();gotoS('scr-profile');setP(1,5);tab('advisor');}
+function clearProf(){
+  if(!confirm('Reset profile?'))return;
+  profile=null;try{localStorage.removeItem('sb_p');}catch(e){}
+  renderProf();gotoS('scr-profile');setP(1,5);tab('advisor');
+}
 
 // ── UTILS ─────────────────────────────────────────────────────
 function f(n){return Number(n).toLocaleString('en-IN');}
-function toast(msg){const o=document.querySelector('.toast');if(o)o.remove();const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),2600);}
+function toast(msg){
+  const o=document.querySelector('.toast');if(o)o.remove();
+  const el=document.createElement('div');el.className='toast';el.textContent=msg;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),2600);
+}
 </script>
 </body>
 </html>
